@@ -1,0 +1,6 @@
+backend/node_modules/
+backend/.env
+backend/npm-debug.log
+backend/*.log
+backend/package-lock.json
+.idea/
