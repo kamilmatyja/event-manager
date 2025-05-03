@@ -87,12 +87,6 @@ router.get('/', userController.getAllUsers);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
- *       403:
- *         description: Forbidden error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Not found error
  *         content:
