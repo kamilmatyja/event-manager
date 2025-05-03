@@ -17,22 +17,6 @@ export function render(containerSelector, htmlContent) {
     }
 }
 
-/** Pokazuje element przez usunięcie klasy 'd-none' */
-export function showElement(selector) {
-    const element = document.querySelector(selector);
-    if (element) {
-        element.classList.remove('d-none');
-    }
-}
-
-/** Ukrywa element przez dodanie klasy 'd-none' */
-export function hideElement(selector) {
-    const element = document.querySelector(selector);
-    if (element) {
-        element.classList.add('d-none');
-    }
-}
-
 /** Wstawia spinner ładowania */
 export function showLoadingSpinner(containerSelector = '#app-content') {
     const spinnerHtml = `
@@ -73,39 +57,4 @@ export function showSuccess(message, containerSelector = '#app-content') {
     } else {
         console.error(`Success container "${containerSelector}" not found.`);
     }
-}
-
-/** Tworzy i zwraca element HTML */
-export function createElement(tag, options = {}) {
-    const element = document.createElement(tag);
-
-    if (options.attributes) {
-        for (const [key, value] of Object.entries(options.attributes)) {
-            element.setAttribute(key, value);
-        }
-    }
-
-    if (options.classes) {
-        element.classList.add(...options.classes);
-    }
-
-    if (options.text) {
-        element.textContent = options.text;
-    }
-
-    if (options.html) {
-        element.innerHTML = options.html;
-    }
-
-    if (options.dataset) {
-        for (const [key, value] of Object.entries(options.dataset)) {
-            element.dataset[key] = value;
-        }
-    }
-    return element;
-}
-
-/** Czyści zawartość kontenera */
-export function clearContainer(containerSelector) {
-    render(containerSelector, '');
 }

@@ -17,7 +17,7 @@ describe('POST /api/v1/auth/register', () => {
     it('should register a new user successfully with valid data (201)', async () => {
         const newUser = createValidUserData({
             first_name: 'Happy',
-            last_name: 'Reg',
+            last_name: 'Rabbit',
             nick: 'happy_reg_user',
             email: 'happy.reg@test.com'
         });
@@ -126,9 +126,9 @@ describe('POST /api/v1/auth/register', () => {
     });
 
     const lengthFields = [
-        {field: 'nick', min: 3, max: 100},
-        {field: 'first_name', min: 2, max: 100},
-        {field: 'last_name', min: 2, max: 100},
+        {field: 'nick', min: 5, max: 100},
+        {field: 'first_name', min: 5, max: 100},
+        {field: 'last_name', min: 5, max: 100},
     ];
 
     lengthFields.forEach(({field, min, max}) => {

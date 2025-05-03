@@ -16,10 +16,6 @@ const findPrelegentById = async (id) => {
     return prelegent;
 };
 
-const findEventsByUserId = async (userId) => {
-    return await prelegentModel.findEventsByUserId(userId);
-};
-
 const createPrelegent = async (prelegentData) => {
     const userExists = await userModel.findById(prelegentData.user_id);
     if (!userExists) {
@@ -93,7 +89,6 @@ const deletePrelegent = async (id) => {
 module.exports = {
     findAllPrelegents,
     findPrelegentById,
-    findEventsByUserId,
     createPrelegent,
     updatePrelegent,
     deletePrelegent,

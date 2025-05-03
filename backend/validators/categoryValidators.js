@@ -5,7 +5,7 @@ const createCategoryValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Category name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Category name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Category name must be between 5 and 100 characters.')
 
         .custom(async (value) => {
             const category = await CategoryModel.findByName(value);
@@ -30,7 +30,7 @@ const updateCategoryValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Category name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Category name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Category name must be between 5 and 100 characters.')
 
         .custom(async (value, {req}) => {
             const category = await CategoryModel.findByName(value);

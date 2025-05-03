@@ -51,20 +51,20 @@ export async function renderUsersList(containerElement) {
                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="userFirstName" class="form-label">Imię</label>
-                                <input type="text" class="form-control" id="userFirstName" required minlength="2" maxlength="100">
-                                <div class="invalid-feedback">Imię jest wymagane (min 2 znaki).</div>
+                                <input type="text" class="form-control" id="userFirstName" required minlength="5" maxlength="100">
+                                <div class="invalid-feedback">Imię jest wymagane (min 5 znaków).</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="userLastName" class="form-label">Nazwisko</label>
-                                <input type="text" class="form-control" id="userLastName" required minlength="2" maxlength="100">
-                                <div class="invalid-feedback">Nazwisko jest wymagane (min 2 znaki).</div>
+                                <input type="text" class="form-control" id="userLastName" required minlength="5" maxlength="100">
+                                <div class="invalid-feedback">Nazwisko jest wymagane (min 5 znaków).</div>
                             </div>
                        </div>
                        <div class="row mb-3">
                            <div class="col-md-6">
                                 <label for="userNick" class="form-label">Nick</label>
-                                <input type="text" class="form-control" id="userNick" required minlength="3" maxlength="100" pattern="^[a-zA-Z0-9_]+$">
-                                <div class="invalid-feedback">Nick jest wymagany (min 3 znaki, tylko litery, cyfry, _).</div>
+                                <input type="text" class="form-control" id="userNick" required minlength="5" maxlength="100" pattern="^[a-zA-Z0-9_]+$">
+                                <div class="invalid-feedback">Nick jest wymagany (min 5 znaków, tylko litery, cyfry, _).</div>
                            </div>
                             <div class="col-md-6">
                                 <label for="userEmail" class="form-label">Email</label>
@@ -75,8 +75,8 @@ export async function renderUsersList(containerElement) {
                       <div class="row mb-3">
                            <div class="col-md-6">
                                 <label for="userPassword" class="form-label">Hasło</label>
-                                <input type="password" class="form-control" id="userPassword" placeholder="Hasło" required pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
-                                <div class="invalid-feedback">Hasło musi mieć min. 8 znaków, literę i cyfrę (jeśli podane).</div>
+                                <input type="password" class="form-control" id="userPassword" placeholder="Hasło" required minlength="8" pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
+                                <div class="invalid-feedback">Hasło musi mieć min. 8 znaków, literę i cyfrę.</div>
                            </div>
                             <div class="col-md-6">
                                 <label for="userRole" class="form-label">Rola</label>
@@ -125,7 +125,6 @@ export async function renderUsersList(containerElement) {
         attachUserEventListeners();
 
     } catch (error) {
-        console.error('Error fetching users:', error);
         ui.showError(`Nie udało się załadować użytkowników: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -271,11 +270,10 @@ function attachUserEventListeners() {
         try {
             await fetchWrapper(url, {method, body: JSON.stringify(userData)});
             modal.hide();
+            await renderUsersList(document.getElementById('app-content'));
             ui.showSuccess(`Użytkownik został ${isEditing ? 'zaktualizowany' : 'dodany'} pomyślnie.`);
-            renderUsersList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error saving user:', error);
-            formError.textContent = `Błąd zapisu: ${error.message}`;
+            formError.textContent = 'Błędne dane';
             formError.style.display = 'block';
         } finally {
             form.classList.remove('was-validated');
@@ -304,11 +302,10 @@ function attachUserEventListeners() {
         try {
             await fetchWrapper(`/users/${idToDelete}`, {method: 'DELETE'});
             deleteModal.hide();
+            await renderUsersList(document.getElementById('app-content'));
             ui.showSuccess('Użytkownik został pomyślnie usunięty.');
-            renderUsersList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error deleting user:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });

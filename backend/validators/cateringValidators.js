@@ -5,7 +5,7 @@ const createCateringValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Catering name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Catering name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Catering name must be between 5 and 100 characters.')
         .custom(async (value) => {
             const catering = await CateringModel.findByName(value);
             if (catering) {
@@ -31,7 +31,7 @@ const updateCateringValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Catering name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Catering name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Catering name must be between 5 and 100 characters.')
         .custom(async (value, {req}) => {
             const catering = await CateringModel.findByName(value);
             if (catering && catering.id !== parseInt(req.params.id, 10)) {

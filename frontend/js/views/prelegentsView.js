@@ -47,14 +47,17 @@ export async function renderPrelegentsList(containerElement) {
                                 <label for="prelegentUserId" class="form-label">Powiązany Użytkownik</label>
                                 <select class="form-select" id="prelegentUserId" required>
                                     <option value="" selected disabled>Wybierz użytkownika...</option>
-                                    ${usersCache.map(user => `<option value="${user.id}">${user.nick} (${user.first_name} ${user.last_name} - ${user.email})</option>`).join('')}
+                                        ${usersCache
+                                            .filter(user => user.role === 2)
+                                            .map(user => `<option value="${user.id}">${user.nick} (${user.first_name} ${user.last_name} - ${user.email})</option>`)
+                                            .join('')}
                                 </select>
                                 <div class="invalid-feedback">Wybór użytkownika jest wymagany.</div>
                            </div>
                            <div class="col-md-6 mb-3">
                                 <label for="prelegentName" class="form-label">Tytuł</label>
-                                <input type="text" class="form-control" id="prelegentName" required minlength="2" maxlength="100">
-                                <div class="invalid-feedback">Nazwa jest wymagana (min 2, max 100 znaków).</div>
+                                <input type="text" class="form-control" id="prelegentName" required minlength="5" maxlength="100">
+                                <div class="invalid-feedback">Nazwa jest wymagana (min 5, max 100 znaków).</div>
                           </div>
                        </div>
                       <div class="mb-3">
@@ -99,7 +102,6 @@ export async function renderPrelegentsList(containerElement) {
         attachPrelegentEventListeners();
 
     } catch (error) {
-        console.error('Error fetching prelegents or users:', error);
         ui.showError(`Nie udało się załadować danych: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -220,11 +222,10 @@ function attachPrelegentEventListeners() {
         try {
             await fetchWrapper(url, {method, body: JSON.stringify(prelegentData)});
             modal.hide();
+            await renderPrelegentsList(document.getElementById('app-content'));
             ui.showSuccess(`Prelegent został ${isEditing ? 'zaktualizowany' : 'dodany'} pomyślnie.`);
-            renderPrelegentsList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error saving prelegent:', error);
-            formError.textContent = `Błąd zapisu: ${error.message}`;
+            formError.textContent = 'Błędne dane';
             formError.style.display = 'block';
         } finally {
             form.classList.remove('was-validated');
@@ -239,7 +240,7 @@ function attachPrelegentEventListeners() {
             const userNick = e.currentTarget.dataset.userNick;
             deleteIdInput.value = id;
             deleteNameSpan.textContent = name;
-            deleteUserNickSpan.textContent = userNick || 'Nieznany';
+            deleteUserNickSpan.textContent = userNick;
             deleteErrorDiv.style.display = 'none';
             deleteModal.show();
         });
@@ -253,11 +254,10 @@ function attachPrelegentEventListeners() {
         try {
             await fetchWrapper(`/prelegents/${idToDelete}`, {method: 'DELETE'});
             deleteModal.hide();
+            await renderPrelegentsList(document.getElementById('app-content'));
             ui.showSuccess('Rekord prelegenta został pomyślnie usunięty.');
-            renderPrelegentsList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error deleting prelegent:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });

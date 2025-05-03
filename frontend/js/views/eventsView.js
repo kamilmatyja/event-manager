@@ -45,6 +45,7 @@ export async function renderEventsList(containerElement) {
         containerElement.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-3">
                 ${isAdmin ? `
+                    <h1>Zarządzanie Wydarzeniami</h1>
                     <button id="add-event-btn" class="btn btn-success">
                         <i class="bi bi-plus-lg"></i> Dodaj Wydarzenie
                     </button>` : ''}
@@ -84,7 +85,6 @@ export async function renderEventsList(containerElement) {
         attachCommonEventListeners();
 
     } catch (error) {
-        console.error('Error fetching events data:', error);
         ui.showError(`Nie udało się załadować danych wydarzeń: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -177,7 +177,7 @@ function renderEventModal() {
                   <div class="row mb-3">
                     <div class="col-md-8">
                       <label for="eventName" class="form-label">Nazwa Wydarzenia</label>
-                      <input type="text" class="form-control" id="eventName" required minlength="5" maxlength="255">
+                      <input type="text" class="form-control" id="eventName" required minlength="5" maxlength="100">
                       <div class="invalid-feedback">Nazwa jest wymagana (min 5 znaków).</div>
                     </div>
                     <div class="col-md-4">
@@ -239,8 +239,8 @@ function renderEventModal() {
                       <div class="border p-2 rounded bg-light relation-checkboxes">${cateringOptions || '<span class="text-muted small">Brak dostępnego cateringu</span>'}</div>
                   </div>
 
-                   <div id="event-form-error" class="alert alert-danger mt-3" style="display: none;"></div>
-                   <div class="modal-footer">
+                  <div id="event-form-error" class="text-danger mb-3" style="display: none;"></div>
+                  <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
                         <button type="submit" class="btn btn-primary">Zapisz</button>
                   </div>
@@ -330,7 +330,6 @@ function attachAdminEventListeners() {
         button.addEventListener('click', async (e) => {
             const id = e.currentTarget.dataset.id;
 
-            ui.showLoadingSpinner(`#${container.id}`);
             try {
                 const event = await fetchWrapper(`/events/${id}`);
                 if (event) {
@@ -370,11 +369,7 @@ function attachAdminEventListeners() {
                     modal.show();
                 }
             } catch (error) {
-                console.error("Error fetching event for edit:", error);
                 ui.showError(`Nie można załadować danych wydarzenia: ${error.message}`);
-            } finally {
-
-                renderEventsList(container);
             }
         });
     });
@@ -425,11 +420,10 @@ function attachAdminEventListeners() {
         try {
             await fetchWrapper(url, {method, body: JSON.stringify(eventData)});
             modal.hide();
+            await renderEventsList(document.getElementById('app-content'));
             ui.showSuccess(`Wydarzenie zostało ${isEditing ? 'zaktualizowane' : 'dodane'} pomyślnie.`);
-            renderEventsList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error saving event:', error);
-            formError.innerHTML = `Błąd zapisu: ${error.message.replace(/;/g, '<br>')}`;
+            formError.textContent = 'Błędne dane';
             formError.style.display = 'block';
         } finally {
             form.classList.remove('was-validated');
@@ -456,11 +450,10 @@ function attachAdminEventListeners() {
         try {
             await fetchWrapper(`/events/${idToDelete}`, {method: 'DELETE'});
             deleteModal.hide();
+            await renderEventsList(document.getElementById('app-content'));
             ui.showSuccess('Wydarzenie zostało pomyślnie usunięte.');
-            renderEventsList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error deleting event:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });
@@ -491,33 +484,15 @@ function attachCommonEventListeners() {
     });
 
     container.querySelectorAll('.details-event-btn').forEach(button => {
-
         if (!button.dataset.listenerAttached) {
             button.addEventListener('click', async (e) => {
                 const eventId = e.currentTarget.dataset.id;
 
-                if (!eventDetailsModal || !eventDetailsModalBody) {
-                    console.error("Event details modal not found!");
-                    return;
-                }
-
-                eventDetailsModalBody.innerHTML = `
-                    <div class="d-flex justify-content-center align-items-center p-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Ładowanie...</span>
-                        </div>
-                    </div>`;
                 eventDetailsModal.show();
 
-                try {
+                const eventDetails = await fetchWrapper(`/events/${eventId}`);
 
-                    const eventDetails = await fetchWrapper(`/events/${eventId}`);
-
-                    eventDetailsModalBody.innerHTML = renderEventDetailsContent(eventDetails);
-                } catch (error) {
-                    console.error(`Error fetching details for event ${eventId}:`, error);
-                    eventDetailsModalBody.innerHTML = `<div class="alert alert-danger">Nie udało się załadować szczegółów wydarzenia: ${error.message}</div>`;
-                }
+                eventDetailsModalBody.innerHTML = renderEventDetailsContent(eventDetails);
             });
             button.dataset.listenerAttached = 'true';
         }

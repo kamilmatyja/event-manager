@@ -73,41 +73,6 @@ router.get('/:id', prelegentController.getPrelegentById);
 
 /**
  * @openapi
- * /prelegents/my:
- *   get:
- *     tags: [Prelegents]
- *     summary: Get my lectures (Prelegent only)
- *     description: Retrieves a list of lectures purchased by the currently logged-in user. Requires Prelegent role.
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: A list of the user's lectures.
- *         content:
- *           application/json:
- *               $ref: '#/components/schemas/Prelegent'
- *       401:
- *         description: Unauthorized error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       403:
- *         description: Forbidden error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-router.get(
-    '/user/me',
-    authenticateToken,
-    authorizeRole(ROLES.PRELEGENT),
-    prelegentController.getMyEvents
-);
-
-/**
- * @openapi
  * /prelegents:
  *   post:
  *     tags: [Prelegents]

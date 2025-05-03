@@ -8,17 +8,17 @@ const createUserValidator = [
     body('first_name')
         .trim()
         .notEmpty().withMessage('First name is required.')
-        .isLength({min: 2, max: 100}).withMessage('First name must be between 2 and 100 characters.'),
+        .isLength({min: 5, max: 100}).withMessage('First name must be between 5 and 100 characters.'),
 
     body('last_name')
         .trim()
         .notEmpty().withMessage('Last name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Last name must be between 2 and 100 characters.'),
+        .isLength({min: 5, max: 100}).withMessage('Last name must be between 5 and 100 characters.'),
 
     body('nick')
         .trim()
         .notEmpty().withMessage('Nick is required.')
-        .isLength({min: 3, max: 100}).withMessage('Nick must be between 3 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Nick must be between 5 and 100 characters.')
         .matches(/^[a-zA-Z0-9_]+$/).withMessage('Nick can only contain letters, numbers, and underscores.')
         .custom(async (value) => {
             const user = await UserModel.findByNick(value);
@@ -58,17 +58,17 @@ const updateUserValidator = [
     body('first_name')
         .trim()
         .notEmpty().withMessage('First name is required.')
-        .isLength({min: 2, max: 100}).withMessage('First name must be between 2 and 100 characters.'),
+        .isLength({min: 5, max: 100}).withMessage('First name must be between 5 and 100 characters.'),
 
     body('last_name')
         .trim()
         .notEmpty().withMessage('Last name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Last name must be between 2 and 100 characters.'),
+        .isLength({min: 5, max: 100}).withMessage('Last name must be between 5 and 100 characters.'),
 
     body('nick')
         .trim()
         .notEmpty().withMessage('Nick is required.')
-        .isLength({min: 3, max: 100}).withMessage('Nick must be between 3 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Nick must be between 5 and 100 characters.')
         .matches(/^[a-zA-Z0-9_]+$/).withMessage('Nick can only contain letters, numbers, and underscores.')
         .custom(async (value, {req}) => {
             const user = await UserModel.findByNick(value);

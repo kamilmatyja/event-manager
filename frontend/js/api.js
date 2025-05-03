@@ -31,14 +31,12 @@ export async function fetchWrapper(endpoint, options = {}) {
 
                 const errorData = await response.json().catch(() => ({message: `HTTP error ${response.status}`}));
                 throw new Error(errorData.message || `HTTP error ${response.status}`);
-
             }
 
             let errorData;
             try {
                 errorData = await response.json();
             } catch (e) {
-
                 errorData = {message: `HTTP error ${response.status}: ${response.statusText}`};
             }
 
@@ -57,8 +55,6 @@ export async function fetchWrapper(endpoint, options = {}) {
         return await response.json();
 
     } catch (error) {
-        console.error('API Fetch Error:', error);
-
         throw error;
     }
 }

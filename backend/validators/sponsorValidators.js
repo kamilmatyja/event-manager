@@ -5,7 +5,7 @@ const createSponsorValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Sponsor name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Sponsor name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Sponsor name must be between 5 and 100 characters.')
         .custom(async (value) => {
             const sponsor = await SponsorModel.findByName(value);
             if (sponsor) {
@@ -30,7 +30,7 @@ const updateSponsorValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Sponsor name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Sponsor name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Sponsor name must be between 5 and 100 characters.')
         .custom(async (value, {req}) => {
             const sponsor = await SponsorModel.findByName(value);
             if (sponsor && sponsor.id !== parseInt(req.params.id, 10)) {

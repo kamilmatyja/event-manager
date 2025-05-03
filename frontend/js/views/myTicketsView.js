@@ -29,8 +29,6 @@ export async function renderMyTickets(containerElement) {
                 const eventDetails = await fetchWrapper(`/events/${ticket.event_id}`);
                 return {ticket: ticket, event: eventDetails, error: null};
             } catch (error) {
-                console.error(`Failed to fetch details for event ${ticket.event_id}:`, error);
-
                 return {
                     ticket: ticket,
                     event: null,
@@ -79,7 +77,6 @@ export async function renderMyTickets(containerElement) {
         attachMyTicketsEventListeners(containerElement);
 
     } catch (error) {
-        console.error('Error fetching my tickets:', error);
         ui.showError(`Nie udało się załadować Twoich biletów: ${error.message}`, `#${containerElement.id}`);
     }
 }

@@ -37,7 +37,7 @@ const eventBaseValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Event name is required.')
-        .isLength({min: 5, max: 255}).withMessage('Event name must be between 5 and 255 characters.'),
+        .isLength({min: 5, max: 100}).withMessage('Event name must be between 5 and 100 characters.'),
     body('description')
         .trim()
         .notEmpty().withMessage('Event description is required.'),

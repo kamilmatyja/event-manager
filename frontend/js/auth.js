@@ -40,6 +40,11 @@ export function getUserRole() {
     return userInfo ? userInfo.role : null;
 }
 
+export function getUserId() {
+    const userInfo = getUserInfo();
+    return userInfo ? userInfo.id : null;
+}
+
 export async function login(email, password) {
     try {
         const data = await fetchWrapper('/auth/login', {

@@ -14,21 +14,21 @@ export function renderLoginForm(containerElement) {
             <div class="col-md-6 col-lg-4">
                 <h1 class="text-center mb-4">Zaloguj się</h1>
                 <form id="login-form" novalidate>
-                    <div id="login-error" class="alert alert-danger" style="display: none;" role="alert"></div>
                     <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required minlength="5">
                         <label for="email">Adres Email</label>
                         <div class="invalid-feedback">
                             Proszę podać poprawny adres email.
                         </div>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" placeholder="Hasło" required pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
+                        <input type="password" class="form-control" id="password" placeholder="Hasło" required minlength="8" pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
                         <label for="password">Hasło</label>
                          <div class="invalid-feedback">
                             Proszę podać hasło.
                         </div>
                     </div>
+                    <div id="login-error" class="text-danger mb-3" style="display: none;"></div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">Zaloguj</button>
                     </div>
@@ -72,7 +72,7 @@ function attachLoginEventListeners() {
         const result = await auth.login(email, password);
 
         if (!result.success) {
-            loginErrorDiv.textContent = result.message || 'Logowanie nie powiodło się.';
+            loginErrorDiv.textContent = 'Błędne dane logowania. Proszę spróbować ponownie.';
             loginErrorDiv.style.display = 'block';
             loginForm.classList.remove('was-validated');
 

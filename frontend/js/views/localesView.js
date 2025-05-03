@@ -39,13 +39,13 @@ export async function renderLocalesList(containerElement) {
                       <input type="hidden" id="localeId">
                       <div class="mb-3">
                         <label for="localeCity" class="form-label">Miasto</label>
-                        <input type="text" class="form-control" id="localeCity" required minlength="2" maxlength="100">
-                        <div class="invalid-feedback">Nazwa miasta jest wymagana (min 2, max 100 znaków).</div>
+                        <input type="text" class="form-control" id="localeCity" required minlength="5" maxlength="100">
+                        <div class="invalid-feedback">Nazwa miasta jest wymagana (min 5, max 100 znaków).</div>
                       </div>
                       <div class="mb-3">
                         <label for="localeName" class="form-label">Nazwa Miejsca</label>
-                        <input type="text" class="form-control" id="localeName" required minlength="3" maxlength="100">
-                         <div class="invalid-feedback">Nazwa miejsca jest wymagana (min 3, max 100 znaków).</div>
+                        <input type="text" class="form-control" id="localeName" required minlength="5" maxlength="100">
+                         <div class="invalid-feedback">Nazwa miejsca jest wymagana (min 5, max 100 znaków).</div>
                       </div>
                        <div id="locale-form-error" class="text-danger mb-3" style="display: none;"></div>
                        <div class="modal-footer">
@@ -84,7 +84,6 @@ export async function renderLocalesList(containerElement) {
         attachLocaleEventListeners();
 
     } catch (error) {
-        console.error('Error fetching locales:', error);
         ui.showError(`Nie udało się załadować lokalizacji: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -192,11 +191,10 @@ function attachLocaleEventListeners() {
         try {
             await fetchWrapper(url, {method, body: JSON.stringify(localeData)});
             modal.hide();
+            await renderLocalesList(document.getElementById('app-content'));
             ui.showSuccess(`Lokalizacja została ${isEditing ? 'zaktualizowana' : 'dodana'} pomyślnie.`);
-            renderLocalesList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error saving locale:', error);
-            formError.textContent = `Błąd zapisu: ${error.message}`;
+            formError.textContent = 'Błędne dane';
             formError.style.display = 'block';
         } finally {
             form.classList.remove('was-validated');
@@ -224,11 +222,10 @@ function attachLocaleEventListeners() {
         try {
             await fetchWrapper(`/locales/${idToDelete}`, {method: 'DELETE'});
             deleteModal.hide();
+            await renderLocalesList(document.getElementById('app-content'));
             ui.showSuccess('Lokalizacja została pomyślnie usunięta.');
-            renderLocalesList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error deleting locale:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });

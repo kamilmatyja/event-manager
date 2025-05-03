@@ -39,8 +39,8 @@ export async function renderResourcesList(containerElement) {
                       <input type="hidden" id="resourceId">
                       <div class="mb-3">
                         <label for="resourceName" class="form-label">Nazwa Sprzętu</label>
-                        <input type="text" class="form-control" id="resourceName" required minlength="2" maxlength="100">
-                        <div class="invalid-feedback">Nazwa jest wymagana (min 2, max 100 znaków).</div>
+                        <input type="text" class="form-control" id="resourceName" required minlength="5" maxlength="100">
+                        <div class="invalid-feedback">Nazwa jest wymagana (min 5, max 100 znaków).</div>
                       </div>
                       <div class="mb-3">
                         <label for="resourceDescription" class="form-label">Opis</label>
@@ -84,7 +84,6 @@ export async function renderResourcesList(containerElement) {
         attachResourceEventListeners();
 
     } catch (error) {
-        console.error('Error fetching resources:', error);
         ui.showError(`Nie udało się załadować sprzętów: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -191,11 +190,10 @@ function attachResourceEventListeners() {
         try {
             await fetchWrapper(url, {method, body: JSON.stringify(resourceData)});
             modal.hide();
+            await renderResourcesList(document.getElementById('app-content'));
             ui.showSuccess(`Sprzęt został ${isEditing ? 'zaktualizowany' : 'dodany'} pomyślnie.`);
-            renderResourcesList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error saving resource:', error);
-            formError.textContent = `Błąd zapisu: ${error.message}`;
+            formError.textContent = 'Błędne dane';
             formError.style.display = 'block';
         } finally {
             form.classList.remove('was-validated');
@@ -221,11 +219,10 @@ function attachResourceEventListeners() {
         try {
             await fetchWrapper(`/resources/${idToDelete}`, {method: 'DELETE'});
             deleteModal.hide();
+            await renderResourcesList(document.getElementById('app-content'));
             ui.showSuccess('Sprzęt został pomyślnie usunięty.');
-            renderResourcesList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error deleting resource:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });

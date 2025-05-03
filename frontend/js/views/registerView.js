@@ -14,39 +14,37 @@ export function renderRegisterForm(containerElement) {
             <div class="col-md-8 col-lg-6">
                 <h1 class="text-center mb-4">Zarejestruj się</h1>
                 <form id="register-form" novalidate>
-                    <div id="register-error" class="alert alert-danger" style="display: none;" role="alert"></div>
-
                     <div class="row mb-3">
                         <div class="col-md-6">
                              <div class="form-floating">
-                                <input type="text" class="form-control" id="first_name" placeholder="Imię" required minlength="2" maxlength="100">
+                                <input type="text" class="form-control" id="first_name" placeholder="Imię" required minlength="5" maxlength="100">
                                 <label for="first_name">Imię</label>
                                 <div class="invalid-feedback">
-                                    Proszę podać imię (min 2 znaki).
+                                    Proszę podać imię (min 5 znaków).
                                 </div>
                             </div>
                         </div>
                          <div class="col-md-6">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="last_name" placeholder="Nazwisko" required minlength="2" maxlength="100">
+                                <input type="text" class="form-control" id="last_name" placeholder="Nazwisko" required minlength="5" maxlength="100">
                                 <label for="last_name">Nazwisko</label>
                                 <div class="invalid-feedback">
-                                     Proszę podać nazwisko (min 2 znaki).
+                                     Proszę podać nazwisko (min 5 znaków).
                                 </div>
                             </div>
                         </div>
                     </div>
 
                      <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="nick" placeholder="Nick" required minlength="3" maxlength="100" pattern="^[a-zA-Z0-9_]+$">
+                        <input type="text" class="form-control" id="nick" placeholder="Nick" required minlength="5" maxlength="100" pattern="^[a-zA-Z0-9_]+$">
                         <label for="nick">Nick</label>
                         <div class="invalid-feedback">
-                            Proszę podać nick (min 3 znaki, tylko litery, cyfry i podkreślnik).
+                            Proszę podać nick (min 5 znaków, tylko litery, cyfry i podkreślnik).
                         </div>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required minlength="5">
                         <label for="email">Adres Email</label>
                         <div class="invalid-feedback">
                             Proszę podać poprawny adres email.
@@ -54,7 +52,7 @@ export function renderRegisterForm(containerElement) {
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" placeholder="Hasło" required pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
+                        <input type="password" class="form-control" id="password" placeholder="Hasło" required minlength="8" pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
                         <label for="password">Hasło</label>
                          <div class="form-text">
                            Minimum 8 znaków, w tym co najmniej jedna litera i jedna cyfra.
@@ -65,13 +63,14 @@ export function renderRegisterForm(containerElement) {
                     </div>
 
                      <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="confirmPassword" placeholder="Potwierdź Hasło" required pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Potwierdź Hasło" required minlength="8" pattern="(?=.*\\d)(?=.*[a-zA-Z]).{8,}">
                         <label for="confirmPassword">Potwierdź Hasło</label>
                         <div class="invalid-feedback">
                             Hasła muszą być identyczne.
                         </div>
                     </div>
 
+                    <div id="register-error" class="text-danger mb-3" style="display: none;"></div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg">Zarejestruj</button>
                     </div>
@@ -156,7 +155,7 @@ function attachRegisterEventListeners() {
         const result = await auth.register(userData);
 
         if (!result.success) {
-            registerErrorDiv.textContent = result.message || 'Rejestracja nie powiodła się.';
+            registerErrorDiv.textContent = 'Błędne dane rejestracji. Proszę spróbować ponownie';
             registerErrorDiv.style.display = 'block';
             registerForm.classList.remove('was-validated');
 

@@ -39,8 +39,8 @@ export async function renderCateringsList(containerElement) {
                       <input type="hidden" id="cateringId">
                       <div class="mb-3">
                         <label for="cateringName" class="form-label">Nazwa Firmy</label>
-                        <input type="text" class="form-control" id="cateringName" required minlength="2" maxlength="100">
-                        <div class="invalid-feedback">Nazwa jest wymagana (min 2, max 100 znaków).</div>
+                        <input type="text" class="form-control" id="cateringName" required minlength="5" maxlength="100">
+                        <div class="invalid-feedback">Nazwa jest wymagana (min 5, max 100 znaków).</div>
                       </div>
                       <div class="mb-3">
                         <label for="cateringDescription" class="form-label">Opis</label>
@@ -84,7 +84,6 @@ export async function renderCateringsList(containerElement) {
         attachCateringEventListeners();
 
     } catch (error) {
-        console.error('Error fetching caterings:', error);
         ui.showError(`Nie udało się załadować cateringu: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -191,11 +190,10 @@ function attachCateringEventListeners() {
         try {
             await fetchWrapper(url, {method, body: JSON.stringify(cateringData)});
             modal.hide();
-            ui.showSuccess(`Cateringu został ${isEditing ? 'zaktualizowany' : 'dodany'} pomyślnie.`);
-            renderCateringsList(document.getElementById('app-content'));
+            await renderCateringsList(document.getElementById('app-content'));
+            ui.showSuccess(`Catering został ${isEditing ? 'zaktualizowany' : 'dodany'} pomyślnie.`);
         } catch (error) {
-            console.error('Error saving catering:', error);
-            formError.textContent = `Błąd zapisu: ${error.message}`;
+            formError.textContent = 'Błędne dane';
             formError.style.display = 'block';
         } finally {
             form.classList.remove('was-validated');
@@ -221,11 +219,10 @@ function attachCateringEventListeners() {
         try {
             await fetchWrapper(`/caterings/${idToDelete}`, {method: 'DELETE'});
             deleteModal.hide();
-            ui.showSuccess('Cateringu został pomyślnie usunięty.');
-            renderCateringsList(document.getElementById('app-content'));
+            await renderCateringsList(document.getElementById('app-content'));
+            ui.showSuccess('Catering został pomyślnie usunięty.');
         } catch (error) {
-            console.error('Error deleting catering:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });

@@ -6,7 +6,6 @@ import {escapeHtml} from "../helpers.js";
 let categoriesCache = [];
 
 export async function renderCategoriesList(containerElement) {
-
     if (auth.getUserRole() !== auth.ROLES_MAP.ADMINISTRATOR) {
         ui.showError('Brak uprawnień do zarządzania kategoriami.', `#${containerElement.id}`);
         return;
@@ -40,8 +39,8 @@ export async function renderCategoriesList(containerElement) {
                       <input type="hidden" id="categoryId">
                       <div class="mb-3">
                         <label for="categoryName" class="form-label">Nazwa Kategorii</label>
-                        <input type="text" class="form-control" id="categoryName" required minlength="2" maxlength="100">
-                        <div class="invalid-feedback">Nazwa jest wymagana (min 2, max 100 znaków).</div>
+                        <input type="text" class="form-control" id="categoryName" required minlength="5" maxlength="100">
+                        <div class="invalid-feedback">Nazwa jest wymagana (min 5, max 100 znaków).</div>
                       </div>
                       <div class="mb-3">
                         <label for="categoryDescription" class="form-label">Opis</label>
@@ -87,7 +86,6 @@ export async function renderCategoriesList(containerElement) {
         attachEventListeners();
 
     } catch (error) {
-        console.error('Error fetching categories:', error);
         ui.showError(`Nie udało się załadować kategorii: ${error.message}`, `#${containerElement.id}`);
     }
 }
@@ -190,14 +188,12 @@ function attachEventListeners() {
         const method = isEditing ? 'PUT' : 'POST';
 
         try {
-            const result = await fetchWrapper(url, {method, body: JSON.stringify(categoryData)});
+            await fetchWrapper(url, {method, body: JSON.stringify(categoryData)});
             categoryModal.hide();
+            await renderCategoriesList(document.getElementById('app-content'));
             ui.showSuccess(`Kategoria została ${isEditing ? 'zaktualizowana' : 'dodana'} pomyślnie.`);
-
-            renderCategoriesList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error saving category:', error);
-            categoryFormError.textContent = `Błąd zapisu: ${error.message}`;
+            categoryFormError.textContent = 'Błędne dane';
             categoryFormError.style.display = 'block';
         } finally {
             categoryForm.classList.remove('was-validated');
@@ -223,11 +219,10 @@ function attachEventListeners() {
         try {
             await fetchWrapper(`/categories/${idToDelete}`, {method: 'DELETE'});
             deleteConfirmModal.hide();
+            await renderCategoriesList(document.getElementById('app-content'));
             ui.showSuccess('Kategoria została pomyślnie usunięta.');
-            renderCategoriesList(document.getElementById('app-content'));
         } catch (error) {
-            console.error('Error deleting category:', error);
-            deleteErrorDiv.textContent = `Błąd usuwania: ${error.message}`;
+            deleteErrorDiv.textContent = 'Błędne dane';
             deleteErrorDiv.style.display = 'block';
         }
     });

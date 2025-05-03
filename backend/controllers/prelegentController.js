@@ -19,12 +19,6 @@ const getPrelegentById = async (req, res) => {
     res.status(200).json(prelegent);
 };
 
-const getMyEvents = async (req, res) => {
-    const userId = req.user.id;
-    const events = await prelegentService.findEventsByUserId(userId);
-    res.status(200).json(events);
-};
-
 const createPrelegent = async (req, res) => {
     const newPrelegent = await prelegentService.createPrelegent(req.body);
 
@@ -60,7 +54,6 @@ const deletePrelegent = async (req, res) => {
 module.exports = {
     getAllPrelegents,
     getPrelegentById,
-    getMyEvents,
     createPrelegent,
     updatePrelegent,
     deletePrelegent,

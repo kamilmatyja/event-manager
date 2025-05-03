@@ -5,7 +5,7 @@ const createResourceValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Resource name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Resource name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Resource name must be between 5 and 100 characters.')
         .custom(async (value) => {
             const resource = await ResourceModel.findByName(value);
             if (resource) {
@@ -30,7 +30,7 @@ const updateResourceValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Resource name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Resource name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Resource name must be between 5 and 100 characters.')
         .custom(async (value, {req}) => {
             const resource = await ResourceModel.findByName(value);
             if (resource && resource.id !== parseInt(req.params.id, 10)) {

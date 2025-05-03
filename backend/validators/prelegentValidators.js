@@ -22,7 +22,7 @@ const createPrelegentValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Prelegent name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Prelegent name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Prelegent name must be between 5 and 100 characters.')
         .custom(async (value) => {
             const prelegent = await PrelegentModel.findByName(value);
             if (prelegent) {
@@ -62,7 +62,7 @@ const updatePrelegentValidator = [
     body('name')
         .trim()
         .notEmpty().withMessage('Prelegent name is required.')
-        .isLength({min: 2, max: 100}).withMessage('Prelegent name must be between 2 and 100 characters.')
+        .isLength({min: 5, max: 100}).withMessage('Prelegent name must be between 5 and 100 characters.')
         .custom(async (value, {req}) => {
             const prelegent = await PrelegentModel.findByName(value);
             if (prelegent && prelegent.id !== parseInt(req.params.id, 10)) {

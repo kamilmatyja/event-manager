@@ -133,25 +133,4 @@ describe('GET /api/v1/prelegents', () => {
         expect(Array.isArray(response.body)).toBe(true);
         expect(response.body.length).toBe(0);
     });
-
-    it('should return 401 if no token is provided', async () => {
-        const response = await request(app)
-            .get('/api/v1/prelegents');
-        expect(response.statusCode).toBe(401);
-    });
-
-    it('should return 401 if token is invalid', async () => {
-        const response = await request(app)
-            .get('/api/v1/prelegents')
-            .set('Authorization', 'Bearer invalidtoken123');
-        expect(response.statusCode).toBe(401);
-    });
-
-    it('should return 403 if user is not an admin (member token)', async () => {
-        const response = await request(app)
-            .get('/api/v1/prelegents')
-            .set('Authorization', `Bearer ${memberToken}`);
-        expect(response.statusCode).toBe(403);
-    });
-
 });

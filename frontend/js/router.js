@@ -80,12 +80,10 @@ async function router() {
     showLoadingSpinner(`#${contentElement.id}`);
 
     try {
-
         await routeConfig.view(contentElement);
     } catch (error) {
         console.error(`Error rendering route ${path}:`, error);
         showError(`Wystąpił błąd podczas ładowania widoku: ${error.message}`, `#${contentElement.id}`);
-
     }
 }
 
