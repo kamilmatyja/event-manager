@@ -9,11 +9,10 @@ const roles = auth.ROLES_MAP;
 function getRoleName(roleValue) {
     for (const name in roles) {
         if (roles[name] === roleValue) {
-
-            return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+            return auth.ROLES_TRANSLATIONS[name] || auth.ROLES_TRANSLATIONS.UNKNOWN;
         }
     }
-    return 'Nieznana';
+    return auth.ROLES_TRANSLATIONS.UNKNOWN;
 }
 
 export async function renderUsersList(containerElement) {

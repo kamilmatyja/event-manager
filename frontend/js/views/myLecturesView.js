@@ -65,11 +65,6 @@ function renderLectureCard(event) {
                     </li>
                  </ul>
             </div>
-             <div class="card-footer text-end bg-light">
-                  <button class="btn btn-sm btn-outline-info lecture-details-btn" data-event-id="${event.id}">
-                     <i class="bi bi-info-circle"></i> Zobacz Szczegóły Wydarzenia
-                  </button>
-             </div>
         </div>
     </div>
     `;
@@ -104,21 +99,27 @@ function attachNavigoLinks(container) {
 }
 
 export async function renderMyLectures(containerElement) {
-    const userRole = auth.getUserRole();
     const loggedInUserId = auth.getUserId();
 
-    if (!loggedInUserId || (userRole !== auth.ROLES_MAP.PRELEGENT && userRole !== auth.ROLES_MAP.ADMINISTRATOR)) {
-        ui.showError('Musisz być zalogowany jako prelegent (lub administrator), aby przeglądać swoje prelekcje.', `#${containerElement.id}`);
+    if (auth.getUserRole() !== auth.ROLES_MAP.PRELEGENT) {
+        ui.showError('Musisz być zalogowany jako prelegent, aby przeglądać swoje prelekcje.', `#${containerElement.id}`);
         return;
     }
 
     ui.showLoadingSpinner(`#${containerElement.id}`);
     try {
-        const allEvents = await fetchWrapper('/events');
+        const [allEvents, allPrelegents] = await Promise.all([
+            fetchWrapper('/events'),
+            fetchWrapper('/prelegents')
+        ]);
 
-        const myLectures = allEvents.filter(event => {
-            return event.prelegents?.some(prelegent => prelegent && prelegent.user_id === loggedInUserId);
-        });
+        const userPrelegent = allPrelegents.find(prelegent => prelegent.user_id === loggedInUserId);
+        if (!userPrelegent) {
+            containerElement.innerHTML = '<p>Nie jesteś aktualnie przypisany(a) do żadnych wydarzeń jako prelegent.</p>';
+            return;
+        }
+
+        const myLectures = allEvents.filter(event => event.prelegent_ids?.includes(userPrelegent.id));
 
         let contentHtml;
         if (!myLectures || myLectures.length === 0) {
@@ -138,6 +139,6 @@ export async function renderMyLectures(containerElement) {
 
         attachNavigoLinks(containerElement);
     } catch (error) {
-        ui.showError(`Wystąpił błąd podczas ładowania Twoich prelekcji. Spróbuj ponownie później. (${error.message})`, `#${containerElement.id}`);
+        ui.showError(`Nie udało się załadować Twoich prelekcji (${error.message})`, `#${containerElement.id}`);
     }
 }

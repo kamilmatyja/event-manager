@@ -119,3 +119,10 @@ export const ROLES_MAP = {
     PRELEGENT: 2,
     ADMINISTRATOR: 3
 };
+
+export const ROLES_TRANSLATIONS = {
+    ADMINISTRATOR: 'Administrator',
+    PRELEGENT: 'Prelegent',
+    MEMBER: 'Członek',
+    UNKNOWN: 'Nieznana'
+};

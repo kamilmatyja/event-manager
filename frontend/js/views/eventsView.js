@@ -11,46 +11,51 @@ let prelegentsCache = [];
 let resourcesCache = [];
 let sponsorsCache = [];
 let cateringsCache = [];
+let ticketsCache = [];
 
 export async function renderEventsList(containerElement) {
     ui.showLoadingSpinner(`#${containerElement.id}`);
     const isAdmin = auth.getUserRole() === auth.ROLES_MAP.ADMINISTRATOR;
+    const isMember = auth.getUserRole() === auth.ROLES_MAP.MEMBER;
 
     try {
+        const promises = [
+            fetchWrapper('/events'),
+            fetchWrapper('/locales'),
+            fetchWrapper('/categories'),
+            fetchWrapper('/prelegents'),
+            fetchWrapper('/resources'),
+            fetchWrapper('/sponsors'),
+            fetchWrapper('/caterings')
+        ];
 
-        const promises = [fetchWrapper('/events')];
-        if (isAdmin) {
-            promises.push(
-                fetchWrapper('/locales'),
-                fetchWrapper('/categories'),
-                fetchWrapper('/prelegents'),
-                fetchWrapper('/resources'),
-                fetchWrapper('/sponsors'),
-                fetchWrapper('/caterings')
-            );
+        if (isMember) {
+            promises.push(fetchWrapper('/tickets/my'));
         }
 
-        const [events, locales, categories, prelegents, resources, sponsors, caterings] = await Promise.all(promises);
+        const [events, locales, categories, prelegents, resources, sponsors, caterings, tickets] = await Promise.all(promises);
 
         eventsCache = events;
-        if (isAdmin) {
-            localesCache = locales || [];
-            categoriesCache = categories || [];
-            prelegentsCache = prelegents || [];
-            resourcesCache = resources || [];
-            sponsorsCache = sponsors || [];
-            cateringsCache = caterings || [];
+        localesCache = locales || [];
+        categoriesCache = categories || [];
+        prelegentsCache = prelegents || [];
+        resourcesCache = resources || [];
+        sponsorsCache = sponsors || [];
+        cateringsCache = caterings || [];
+
+        if (isMember) {
+            ticketsCache = tickets || [];
         }
 
         containerElement.innerHTML = `
+        ${isAdmin ? `
             <div class="d-flex justify-content-between align-items-center mb-3">
-                ${isAdmin ? `
-                    <h1>Zarządzanie Wydarzeniami</h1>
-                    <button id="add-event-btn" class="btn btn-success">
-                        <i class="bi bi-plus-lg"></i> Dodaj Wydarzenie
-                    </button>` : ''}
-            </div>
-            <div id="events-list-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <h1>Zarządzanie Wydarzeniami</h1>
+                <button id="add-event-btn" class="btn btn-success">
+                    <i class="bi bi-plus-lg"></i> Dodaj Wydarzenie
+                </button>
+            </div>` : ''}
+            <div id="events-list-container" class="row row-cols-1 row-cols-md-2 g-4">
                 ${renderEventCards(eventsCache)}
             </div>
 
@@ -104,6 +109,11 @@ function renderEventCard(event) {
     const startDate = new Date(event.started_at).toLocaleString('pl-PL', {dateStyle: 'short', timeStyle: 'short'});
     const endDate = new Date(event.ended_at).toLocaleString('pl-PL', {dateStyle: 'short', timeStyle: 'short'});
     const price = parseFloat(event.price).toFixed(2);
+    let hasTicket = false;
+
+    if (ticketsCache) {
+        hasTicket = ticketsCache.some(ticket => ticket.event_id === event.id);
+    }
 
     let actionButtons = '';
     if (isAdmin) {
@@ -111,7 +121,7 @@ function renderEventCard(event) {
             <button class="btn btn-sm btn-outline-primary me-1 edit-event-btn" data-id="${event.id}" title="Edytuj"><i class="bi bi-pencil-square"></i></button>
             <button class="btn btn-sm btn-outline-danger delete-event-btn" data-id="${event.id}" data-name="${escapeHtml(event.name)}" title="Usuń"><i class="bi bi-trash"></i></button>
         `;
-    } else if (isMember) {
+    } else if (isMember && new Date(event.started_at) > new Date() && !hasTicket) {
         actionButtons = `<button class="btn btn-sm btn-success register-event-btn" data-id="${event.id}"><i class="bi bi-check-lg"></i> Zapisz się</button>`;
     }
 
@@ -349,19 +359,19 @@ function attachAdminEventListeners() {
                     endedAtInput.value = event.ended_at ? new Date(new Date(event.ended_at).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : '';
 
                     form.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-                    event.prelegentIds?.forEach(pId => {
+                    event.prelegent_ids?.forEach(pId => {
                         const cb = form.querySelector(`#prel-${pId}`);
                         if (cb) cb.checked = true;
                     });
-                    event.resourceIds?.forEach(rId => {
+                    event.resource_ids?.forEach(rId => {
                         const cb = form.querySelector(`#res-${rId}`);
                         if (cb) cb.checked = true;
                     });
-                    event.sponsorIds?.forEach(sId => {
+                    event.sponsor_ids?.forEach(sId => {
                         const cb = form.querySelector(`#spon-${sId}`);
                         if (cb) cb.checked = true;
                     });
-                    event.cateringIds?.forEach(cId => {
+                    event.catering_ids?.forEach(cId => {
                         const cb = form.querySelector(`#catr-${cId}`);
                         if (cb) cb.checked = true;
                     });
@@ -406,10 +416,10 @@ function attachAdminEventListeners() {
             category_id: parseInt(categorySelect.value),
             started_at: startDate.toISOString(),
             ended_at: endDate.toISOString(),
-            prelegentIds,
-            resourceIds,
-            sponsorIds,
-            cateringIds
+            prelegent_ids: prelegentIds,
+            resource_ids: resourceIds,
+            sponsor_ids: sponsorIds,
+            catering_ids: cateringIds
         };
 
         const eventId = idInput.value;
@@ -547,10 +557,10 @@ function renderEventDetailsContent(event) {
         <hr>
         <h6>Powiązane zasoby:</h6>
         <ul class="list-group list-group-flush mb-3">
-            ${renderRelatedList(event.prelegentIds, prelegentsCache, 'id', 'name', 'Prelegenci')}
-            ${renderRelatedList(event.resourceIds, resourcesCache, 'id', 'name', 'Zasoby')}
-            ${renderRelatedList(event.sponsorIds, sponsorsCache, 'id', 'name', 'Sponsorzy')}
-            ${renderRelatedList(event.cateringIds, cateringsCache, 'id', 'name', 'Catering')}
+            ${renderRelatedList(event.prelegent_ids, prelegentsCache, 'id', 'name', 'Prelegenci')}
+            ${renderRelatedList(event.resource_ids, resourcesCache, 'id', 'name', 'Zasoby')}
+            ${renderRelatedList(event.sponsor_ids, sponsorsCache, 'id', 'name', 'Sponsorzy')}
+            ${renderRelatedList(event.catering_ids, cateringsCache, 'id', 'name', 'Catering')}
         </ul>
     `;
 }

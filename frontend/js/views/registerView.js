@@ -104,23 +104,20 @@ function attachRegisterEventListeners() {
     confirmPasswordInput.addEventListener('input', () => {
         if (passwordInput.value !== confirmPasswordInput.value) {
             confirmPasswordInput.setCustomValidity('Hasła muszą być identyczne.');
-
-            if (registerForm.classList.contains('was-validated')) {
-                confirmPasswordInput.reportValidity();
-            }
+            confirmPasswordInput.classList.add('is-invalid');
         } else {
             confirmPasswordInput.setCustomValidity('');
+            confirmPasswordInput.classList.remove('is-invalid');
         }
     });
 
     passwordInput.addEventListener('input', () => {
         if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
             confirmPasswordInput.setCustomValidity('Hasła muszą być identyczne.');
-            if (registerForm.classList.contains('was-validated')) {
-                confirmPasswordInput.reportValidity();
-            }
+            confirmPasswordInput.classList.add('is-invalid');
         } else {
             confirmPasswordInput.setCustomValidity('');
+            confirmPasswordInput.classList.remove('is-invalid');
         }
     });
 
