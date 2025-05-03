@@ -103,7 +103,7 @@ router.get(
     '/user/me',
     authenticateToken,
     authorizeRole(ROLES.PRELEGENT),
-    prelegentController.getMyPrelegentProfile
+    prelegentController.getMyEvents
 );
 
 /**

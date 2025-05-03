@@ -2,6 +2,7 @@ import {fetchWrapper} from '../api.js';
 import * as ui from '../ui.js';
 import * as auth from '../auth.js';
 import {navigateTo} from '../router.js';
+import {escapeHtml} from "../helpers.js";
 
 let eventsCache = [];
 let localesCache = [];
@@ -43,7 +44,6 @@ export async function renderEventsList(containerElement) {
 
         containerElement.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h1>Nadchodzące Wydarzenia</h1>
                 ${isAdmin ? `
                     <button id="add-event-btn" class="btn btn-success">
                         <i class="bi bi-plus-lg"></i> Dodaj Wydarzenie
@@ -277,16 +277,6 @@ function renderDeleteConfirmModal() {
      `;
 }
 
-function escapeHtml(unsafe) {
-    if (typeof unsafe !== 'string') return unsafe;
-    return unsafe
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, "\"")
-        .replace(/'/g, "'");
-}
-
 function attachNavigoLinks(container) {
     container.querySelectorAll('a[data-navigo]').forEach(link => {
         if (!link.dataset.listenerAttached) {
@@ -322,7 +312,6 @@ function attachAdminEventListeners() {
     const deleteErrorDiv = document.getElementById('delete-event-error');
 
     if (!modalElement || !form || !deleteModalElement) {
-        console.warn("Event modal elements not found, admin listeners not attached.");
         return;
     }
 
@@ -493,6 +482,7 @@ function attachCommonEventListeners() {
                     method: 'POST',
                     body: JSON.stringify({event_id: parseInt(eventId)})
                 });
+                await renderEventsList(container);
                 ui.showSuccess(`Pomyślnie zapisano na wydarzenie! Bilet ID: ${result.id}`);
             } catch (error) {
                 ui.showError(`Błąd zapisu na wydarzenie: ${error.message}`);
@@ -505,7 +495,6 @@ function attachCommonEventListeners() {
         if (!button.dataset.listenerAttached) {
             button.addEventListener('click', async (e) => {
                 const eventId = e.currentTarget.dataset.id;
-                console.log(`Fetching details for event ${eventId}`);
 
                 if (!eventDetailsModal || !eventDetailsModalBody) {
                     console.error("Event details modal not found!");

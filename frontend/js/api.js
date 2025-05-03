@@ -26,9 +26,7 @@ export async function fetchWrapper(endpoint, options = {}) {
 
         if (!response.ok) {
 
-            if (response.status === 401 || response.status === 403) {
-                console.warn(`Received ${response.status}, logging out.`);
-
+            if ((response.status === 401 || response.status === 403) && token) {
                 setTimeout(logout, 0);
 
                 const errorData = await response.json().catch(() => ({message: `HTTP error ${response.status}`}));

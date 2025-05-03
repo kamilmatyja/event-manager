@@ -2,30 +2,53 @@ import {fetchWrapper} from '../api.js';
 import * as ui from '../ui.js';
 import * as auth from '../auth.js';
 import {navigateTo} from '../router.js';
+import {escapeHtml} from "../helpers.js";
 
 export async function renderMyTickets(containerElement) {
-
     const userRole = auth.getUserRole();
     if (userRole !== auth.ROLES_MAP.MEMBER) {
         ui.showError('Ta sekcja jest dostępna tylko dla uczestników.', `#${containerElement.id}`);
-
         return;
     }
 
     ui.showLoadingSpinner(`#${containerElement.id}`);
     try {
 
-        const myTickets = await fetchWrapper('/tickets/my');
+        const myBasicTickets = await fetchWrapper('/tickets/my');
 
         let contentHtml;
-        if (!myTickets || myTickets.length === 0) {
-            contentHtml = `<p class="text-center">Nie masz aktualnie żadnych zakupionych biletów.</p>`;
-        } else {
-
-            myTickets.sort((a, b) => new Date(a.event_started_at) - new Date(b.event_started_at));
-            const ticketsHtml = myTickets.map(ticket => renderTicketCard(ticket)).join('');
-            contentHtml = `<div class="row row-cols-1 row-cols-md-2 g-4">${ticketsHtml}</div>`;
+        if (!myBasicTickets || myBasicTickets.length === 0) {
+            containerElement.innerHTML = `<p>Nie masz aktualnie żadnych zakupionych biletów.</p>`;
+            attachNavigoLinks(containerElement);
+            return;
         }
+
+        const ticketDetailsPromises = myBasicTickets.map(async (ticket) => {
+            try {
+
+                const eventDetails = await fetchWrapper(`/events/${ticket.event_id}`);
+                return {ticket: ticket, event: eventDetails, error: null};
+            } catch (error) {
+                console.error(`Failed to fetch details for event ${ticket.event_id}:`, error);
+
+                return {
+                    ticket: ticket,
+                    event: null,
+                    error: `Nie udało się załadować danych wydarzenia (ID: ${ticket.event_id})`
+                };
+            }
+        });
+
+        const myTicketsWithDetails = await Promise.all(ticketDetailsPromises);
+
+        myTicketsWithDetails.sort((a, b) => {
+            const dateA = a.event ? new Date(a.event.started_at) : new Date(0);
+            const dateB = b.event ? new Date(b.event.started_at) : new Date(0);
+            return dateA - dateB;
+        });
+
+        const ticketsHtml = myTicketsWithDetails.map(ticketData => renderTicketCard(ticketData)).join('');
+        contentHtml = `<div class="row row-cols-1 row-cols-md-2 g-4">${ticketsHtml}</div>`;
 
         containerElement.innerHTML = `
             ${contentHtml}
@@ -61,21 +84,39 @@ export async function renderMyTickets(containerElement) {
     }
 }
 
-function renderTicketCard(ticket) {
-    const startDate = new Date(eventDetails.started_at).toLocaleString('pl-PL', {
+function renderTicketCard(ticketData) {
+
+    if (!ticketData.event) {
+        return `
+        <div class="col">
+            <div class="card h-100 shadow-sm border-danger">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">Błąd ładowania wydarzenia</h5>
+                    <p class="card-text small">${error || `Nie można załadować danych dla wydarzenia ID: ${event_id}`}</p>
+                    <p class="card-text small">ID Biletu: #${ticketId}</p>
+                    </div>
+            </div>
+        </div>
+        `;
+    }
+
+    const startDate = new Date(ticketData.event.started_at).toLocaleString('pl-PL', {
         dateStyle: 'medium',
         timeStyle: 'short'
     });
-    const endDate = new Date(eventDetails.ended_at).toLocaleString('pl-PL', {dateStyle: 'medium', timeStyle: 'short'});
-    const purchaseDate = new Date(ticket.created_at).toLocaleString('pl-PL', {
+    const endDate = new Date(ticketData.event.ended_at).toLocaleString('pl-PL', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+    });
+    const purchaseDate = new Date(ticketData.ticket.created_at).toLocaleString('pl-PL', {
         dateStyle: 'short',
         timeStyle: 'short'
     });
-    const purchasePrice = parseFloat(ticket.price).toFixed(2);
+    const purchasePrice = parseFloat(ticketData.ticket.price).toFixed(2);
 
     const now = new Date();
-    const start = new Date(eventDetails.started_at);
-    const end = new Date(eventDetails.ended_at);
+    const start = new Date(ticketData.event.started_at);
+    const end = new Date(ticketData.event.ended_at);
     let statusBadge = '';
     let canUnsubscribe = false;
 
@@ -89,7 +130,7 @@ function renderTicketCard(ticket) {
     }
 
     const unsubscribeButtonHtml = canUnsubscribe ? `
-        <button class="btn btn-sm btn-outline-danger unsubscribe-btn" data-ticket-id="${ticket.id}" data-event-name="${escapeHtml(eventDetails.name)}" title="Wypisz się z wydarzenia">
+        <button class="btn btn-sm btn-outline-danger unsubscribe-btn" data-ticket-id="${ticketData.ticket.id}" data-event-name="${escapeHtml(ticketData.event.name)}" title="Wypisz się z wydarzenia">
             <i class="bi bi-calendar-x"></i> Wypisz się
         </button>
     ` : '';
@@ -98,12 +139,12 @@ function renderTicketCard(ticket) {
     <div class="col">
         <div class="card h-100 shadow-sm">
              <div class="card-header d-flex justify-content-between align-items-center">
-                 <h5 class="mb-0">${escapeHtml(eventDetails.name)}</h5>
+                 <h5 class="mb-0">${escapeHtml(ticketData.event.name)}</h5>
                  ${statusBadge}
             </div>
             <div class="card-body">
                 <p class="card-text mb-1">
-                    <i class="bi bi-geo-alt-fill text-secondary"></i> ${escapeHtml(ticket.locale_name)}, ${escapeHtml(ticket.locale_city)}
+                    <i class="bi bi-geo-alt-fill text-secondary"></i> ${escapeHtml(ticketData.event.locale_name)}, ${escapeHtml(ticketData.event.locale_city)}
                 </p>
                 <p class="card-text small">
                     <i class="bi bi-calendar-range text-secondary"></i> ${startDate} - ${endDate}
@@ -111,7 +152,7 @@ function renderTicketCard(ticket) {
                  <ul class="list-group list-group-flush mt-3 small">
                      <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-0">
                          ID Biletu:
-                         <span class="fw-bold">#${ticket.id}</span>
+                         <span class="fw-bold">#${ticketData.ticket.id}</span>
                      </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-0">
                         Cena zakupu:
@@ -125,9 +166,6 @@ function renderTicketCard(ticket) {
             </div>
             <div class="card-footer text-end bg-light">
                   ${unsubscribeButtonHtml}
-                 <button class="btn btn-sm btn-outline-info ticket-details-btn" data-event-id="${ticket.event_id}">
-                     <i class="bi bi-info-circle"></i> Zobacz Szczegóły Wydarzenia
-                 </button>
             </div>
         </div>
     </div>
@@ -152,7 +190,6 @@ function attachMyTicketsEventListeners(container) {
     const deleteIdInput = document.getElementById('ticket-to-delete-id');
     const deleteNameSpan = document.getElementById('ticket-event-to-delete-name');
     const confirmDeleteBtn = document.getElementById('confirm-delete-ticket-btn');
-    const deleteErrorDiv = document.getElementById('delete-ticket-error');
 
     container.querySelectorAll('.unsubscribe-btn').forEach(button => {
         if (!button.dataset.listenerAttached) {
@@ -162,7 +199,6 @@ function attachMyTicketsEventListeners(container) {
                 const eventName = e.currentTarget.dataset.eventName;
                 deleteIdInput.value = ticketId;
                 deleteNameSpan.textContent = eventName;
-                deleteErrorDiv.style.display = 'none';
                 deleteModal.show();
             });
             button.dataset.listenerAttached = 'true';
@@ -172,47 +208,22 @@ function attachMyTicketsEventListeners(container) {
     if (confirmDeleteBtn) {
         if (!confirmDeleteBtn.dataset.listenerAttached) {
             confirmDeleteBtn.addEventListener('click', async () => {
-                if (!deleteIdInput || !deleteErrorDiv) return;
+                if (!deleteIdInput) return;
                 const idToDelete = deleteIdInput.value;
                 if (!idToDelete) return;
-                deleteErrorDiv.style.display = 'none';
 
                 try {
                     await fetchWrapper(`/tickets/${idToDelete}`, {method: 'DELETE'});
                     if (deleteModal) deleteModal.hide();
+                    await renderMyTickets(document.getElementById('app-content'));
                     ui.showSuccess('Pomyślnie wypisano z wydarzenia.');
-                    renderMyTickets(document.getElementById('app-content'));
                 } catch (error) {
-                    console.error('Error unsubscribing:', error);
-                    deleteErrorDiv.textContent = `Błąd wypisywania: ${error.message}`;
-                    deleteErrorDiv.style.display = 'block';
+                    ui.showError(`Błąd wypisywania: ${error.message}`);
                 }
             });
             confirmDeleteBtn.dataset.listenerAttached = 'true';
         }
     }
 
-    container.querySelectorAll('.ticket-details-btn').forEach(button => {
-        if (!button.dataset.listenerAttached) {
-            button.addEventListener('click', (e) => {
-                const eventId = e.currentTarget.dataset.eventId;
-                console.log(`Navigate to details for event ${eventId}`);
-                alert(`Przejście do szczegółów wydarzenia ${eventId} - niezaimplementowane.`);
-
-            });
-            button.dataset.listenerAttached = 'true';
-        }
-    });
-
     attachNavigoLinks(container);
-}
-
-function escapeHtml(unsafe) {
-    if (typeof unsafe !== 'string') return unsafe;
-    return unsafe
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, "\"")
-        .replace(/'/g, "'");
 }

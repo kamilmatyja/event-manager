@@ -1,6 +1,7 @@
 import {fetchWrapper} from '../api.js';
 import * as ui from '../ui.js';
 import * as auth from '../auth.js';
+import {escapeHtml} from "../helpers.js";
 
 let localesCache = [];
 
@@ -124,16 +125,6 @@ function renderLocalesTable(locales) {
             </tbody>
         </table>
     `;
-}
-
-function escapeHtml(unsafe) {
-    if (typeof unsafe !== 'string') return unsafe;
-    return unsafe
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, "\"")
-        .replace(/'/g, "'");
 }
 
 function attachLocaleEventListeners() {

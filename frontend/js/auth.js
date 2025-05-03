@@ -85,13 +85,10 @@ export async function register(userData) {
 
 export async function logout() {
     try {
-
         await fetchWrapper('/auth/logout', {method: 'POST'});
     } catch (error) {
-
         console.warn('Logout API call failed (might be expected if token was already invalid):', error.message);
     } finally {
-
         removeToken();
         renderNavbar();
         navigateTo('#/login');
@@ -106,7 +103,7 @@ export function getDefaultRouteForUser() {
         case 2:
             return '#/my-lectures';
         case 3:
-            return '#/events';
+            return '#/users';
         default:
             return '#/events';
     }

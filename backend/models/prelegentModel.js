@@ -47,6 +47,14 @@ const findByUserId = (userId) => {
     return db(TABLE_NAME).where({user_id: userId}).first();
 }
 
+const findEventsByUserId = async (userId) => {
+    return db(TABLE_NAME)
+        .select('events.*')
+        .innerJoin('event_prelegents', 'prelegents.id', 'event_prelegents.prelegent_id')
+        .innerJoin('events', 'event_prelegents.event_id', 'events.id')
+        .where('prelegents.user_id', userId);
+};
+
 const create = (prelegentData) => {
     return db(TABLE_NAME)
         .insert(prelegentData)
@@ -74,6 +82,7 @@ module.exports = {
     findByName,
     findByDescription,
     findByUserId,
+    findEventsByUserId,
     create,
     update,
     deleteById,

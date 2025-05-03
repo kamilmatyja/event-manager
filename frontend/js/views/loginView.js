@@ -80,9 +80,6 @@ function attachLoginEventListeners() {
                 emailInput.classList.add('is-invalid');
                 passwordInput.classList.add('is-invalid');
             }
-        } else {
-
-            console.log('Login successful for:', result.user.email);
         }
     });
 

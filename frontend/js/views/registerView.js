@@ -168,9 +168,6 @@ function attachRegisterEventListeners() {
                 nickInput.classList.add('is-invalid');
                 nickInput.focus();
             }
-        } else {
-
-            console.log('Registration successful for:', result.user.email);
         }
     });
 
