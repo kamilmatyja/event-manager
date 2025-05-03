@@ -41,6 +41,13 @@ const findByDescription = (description) => {
     return db(TABLE_NAME).where({description}).first();
 };
 
+const findByTicketId = (ticketId) => {
+    return db(TABLE_NAME)
+        .join('event_tickets', 'events.id', '=', 'event_tickets.event_id')
+        .where('event_tickets.id', ticketId)
+        .first();
+};
+
 const create = (eventData, trx) => {
     return trx(TABLE_NAME)
         .insert(eventData)
@@ -102,6 +109,7 @@ module.exports = {
     findByIdDetails,
     findByName,
     findByDescription,
+    findByTicketId,
     create,
     update,
     deleteById,

@@ -2,6 +2,7 @@ const eventTicketModel = require('../models/eventTicketModel');
 const eventModel = require('../models/eventModel');
 const NotFoundError = require("../errors/NotFoundError");
 const ConflictError = require("../errors/ConflictError");
+const ForbiddenError = require("../errors/ForbiddenError");
 
 const getUserTickets = async (userId) => {
     return await eventTicketModel.findAllWithEventDetailsByUser(userId);
@@ -45,8 +46,7 @@ const deleteTicket = async (userId, ticketId) => {
     }
 
     if (ticket.user_id !== userId) {
-
-        throw new ConflictError('Forbidden: You can only delete your own tickets.');
+        throw new ForbiddenError('Forbidden: You can only delete your own tickets.');
     }
 
     const deletedCount = await eventTicketModel.deleteById(ticketId);

@@ -73,20 +73,20 @@ describe('GET /api/v1/events', () => {
         expect(foundEvent1).toHaveProperty('locale_name', locale1.name);
         expect(foundEvent1).toHaveProperty('category_name', category1.name);
         expect(foundEvent1).toHaveProperty('ticket_count', 1);
-        expect(foundEvent1).toHaveProperty('prelegentIds', [prelegent1.id]);
-        expect(foundEvent1).toHaveProperty('resourceIds', [resource1.id]);
-        expect(foundEvent1).toHaveProperty('sponsorIds', [sponsor1.id]);
-        expect(foundEvent1).toHaveProperty('cateringIds', [catering1.id]);
+        expect(foundEvent1).toHaveProperty('prelegent_ids', [prelegent1.id]);
+        expect(foundEvent1).toHaveProperty('resource_ids', [resource1.id]);
+        expect(foundEvent1).toHaveProperty('sponsor_ids', [sponsor1.id]);
+        expect(foundEvent1).toHaveProperty('catering_ids', [catering1.id]);
         expect(foundEvent1).toHaveProperty('created_at');
         expect(foundEvent1).toHaveProperty('updated_at');
 
         const foundEvent2 = response.body.find(ev => ev.id === event2.id);
         expect(foundEvent2).toBeDefined();
         expect(foundEvent2).toHaveProperty('ticket_count', 0);
-        expect(foundEvent2).toHaveProperty('prelegentIds', []);
-        expect(foundEvent2).toHaveProperty('resourceIds', []);
-        expect(foundEvent2).toHaveProperty('sponsorIds', []);
-        expect(foundEvent2).toHaveProperty('cateringIds', []);
+        expect(foundEvent2).toHaveProperty('prelegent_ids', []);
+        expect(foundEvent2).toHaveProperty('resource_ids', []);
+        expect(foundEvent2).toHaveProperty('sponsor_ids', []);
+        expect(foundEvent2).toHaveProperty('catering_ids', []);
     });
 
     it('should return an empty list if no events exist (200)', async () => {

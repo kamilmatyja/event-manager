@@ -11,15 +11,15 @@ const createFullUpdateEventData = (currentEventData, updates) => {
 
     const {
         id, created_at, updated_at, locale_name, category_name,
-        ticket_count, prelegentIds, resourceIds, sponsorIds, cateringIds,
+        ticket_count, prelegent_ids, resource_ids, sponsor_ids, catering_ids,
         ...baseData
     } = currentEventData;
 
     const currentRelations = {
-        prelegentIds: currentEventData.prelegentIds || [],
-        resourceIds: currentEventData.resourceIds || [],
-        sponsorIds: currentEventData.sponsorIds || [],
-        cateringIds: currentEventData.cateringIds || [],
+        prelegent_ids: currentEventData.prelegent_ids || [],
+        resource_ids: currentEventData.resource_ids || [],
+        sponsor_ids: currentEventData.sponsor_ids || [],
+        catering_ids: currentEventData.catering_ids || [],
     };
 
     return {
@@ -185,11 +185,10 @@ describe('PUT /api/v1/events/{id}', () => {
 
     it('should update only relations successfully (add prelegent, remove sponsor) (200)', async () => {
         const updates = {
-            prelegentIds: [prelegent1.id, prelegent2.id],
-            sponsorIds: [],
-
-            resourceIds: [],
-            cateringIds: [catering1.id]
+            prelegent_ids: [prelegent1.id, prelegent2.id],
+            sponsor_ids: [],
+            resource_ids: [],
+            catering_ids: [catering1.id]
         };
         const currentData = await db('events').where({id: eventToUpdate.id}).first();
         const fullUpdateData = createFullUpdateEventData(currentData, updates);
@@ -201,11 +200,11 @@ describe('PUT /api/v1/events/{id}', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body.id).toBe(eventToUpdate.id);
-        expect(response.body.prelegentIds).toEqual(expect.arrayContaining([prelegent1.id, prelegent2.id]));
-        expect(response.body.prelegentIds).toHaveLength(2);
-        expect(response.body.sponsorIds).toEqual([]);
-        expect(response.body.resourceIds).toEqual([]);
-        expect(response.body.cateringIds).toEqual([catering1.id]);
+        expect(response.body.prelegent_ids).toEqual(expect.arrayContaining([prelegent1.id, prelegent2.id]));
+        expect(response.body.prelegent_ids).toHaveLength(2);
+        expect(response.body.sponsor_ids).toEqual([]);
+        expect(response.body.resource_ids).toEqual([]);
+        expect(response.body.catering_ids).toEqual([catering1.id]);
 
         const links = await Promise.all([
             db('event_prelegents').where({event_id: eventToUpdate.id}).orderBy('prelegent_id'),
@@ -241,16 +240,70 @@ describe('PUT /api/v1/events/{id}', () => {
         expect(response.body.ended_at).toBe(newEndDate);
     });
 
-    it('should return 401 if no token is provided', async () => { /* ... */
-    });
-    it('should return 401 if token is invalid', async () => { /* ... */
-    });
-    it('should return 403 if user is not an admin', async () => { /* ... */
+    it('should return 401 if no token is provided', async () => {
+
+        const updates = {name: 'Update Attempt No Token'};
+
+        const fullUpdateData = createFullUpdateEventData(eventToUpdate, updates);
+
+        const response = await request(app)
+            .put(`/api/v1/events/${eventToUpdate.id}`)
+            .send(fullUpdateData);
+        expect(response.statusCode).toBe(401);
     });
 
-    it('should return 404 if event ID does not exist', async () => { /* ... */
+    it('should return 401 if token is invalid', async () => {
+        const updates = {name: 'Update Attempt Invalid Token'};
+        const fullUpdateData = createFullUpdateEventData(eventToUpdate, updates);
+
+        const response = await request(app)
+            .put(`/api/v1/events/${eventToUpdate.id}`)
+            .set('Authorization', 'Bearer invalidtoken123')
+            .send(fullUpdateData);
+        expect(response.statusCode).toBe(401);
     });
-    it('should return 400 if event ID format is invalid', async () => { /* ... */
+
+    it('should return 403 if user is not an admin', async () => {
+        const updates = {name: 'Update Attempt Member Token'};
+        const fullUpdateData = createFullUpdateEventData(eventToUpdate, updates);
+
+        const response = await request(app)
+            .put(`/api/v1/events/${eventToUpdate.id}`)
+            .set('Authorization', `Bearer ${memberToken}`)
+            .send(fullUpdateData);
+        expect(response.statusCode).toBe(403);
+    });
+
+    it('should return 404 if event ID does not exist', async () => {
+        const nonExistentId = eventToUpdate.id + 999;
+
+        const dummyEventData = {...eventToUpdate};
+        delete dummyEventData.id;
+        delete dummyEventData.created_at;
+        delete dummyEventData.updated_at;
+        const fullUpdateData = createFullUpdateEventData(dummyEventData, {
+            name: 'NotFoundUpdate',
+            description: 'NotFoundUpdate'
+        });
+
+        const response = await request(app)
+            .put(`/api/v1/events/${nonExistentId}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(fullUpdateData);
+
+        expect(response.statusCode).toBe(404);
+    });
+
+    it('should return 400 if event ID format is invalid', async () => {
+        const invalidId = 'abc';
+
+        const fullUpdateData = createFullUpdateEventData(eventToUpdate, {name: 'InvalidIdUpdate'});
+
+        const response = await request(app)
+            .put(`/api/v1/events/${invalidId}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send(fullUpdateData);
+        expect(response.statusCode).toBe(400);
     });
 
     it('should return 400 if required field (e.g., name) is missing in PUT', async () => {
@@ -278,44 +331,57 @@ describe('PUT /api/v1/events/{id}', () => {
         expect(response.body.errors.some(err => err.path === 'ended_at' && err.msg.includes('after start date'))).toBe(true);
     });
 
-    it('should return 400 if prelegentIds contains non-existent ID during update', async () => {
+    it('should return 400 if prelegent_ids contains non-existent ID during update', async () => {
         const nonExistentId = prelegent1.id + 999;
-        const updates = {prelegentIds: [nonExistentId]};
+        const updates = {prelegent_ids: [nonExistentId]};
         const currentData = await db('events').where({id: eventToUpdate.id}).first();
         const fullUpdateData = createFullUpdateEventData(currentData, updates);
 
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
         expect(response.statusCode).toBe(400);
-        expect(response.body.errors.some(err => err.path === 'prelegentIds' && err.msg.includes('not found'))).toBe(true);
+        expect(response.body.errors.some(err => err.path === 'prelegent_ids' && err.msg.includes('not found'))).toBe(true);
     });
 
-    it('should return 400 if updated dates cause prelegent time conflict', async () => {
+    it('should return 409 if updated dates cause prelegent time conflict', async () => {
 
         const updates = {
             started_at: conflictingEvent.started_at.toISOString(),
             ended_at: conflictingEvent.ended_at.toISOString(),
-            prelegentIds: [prelegent2.id]
+            prelegent_ids: [prelegent2.id]
         };
         const currentData = await db('events').where({id: eventToUpdate.id}).first();
         const fullUpdateData = createFullUpdateEventData(currentData, updates);
 
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(409);
         expect(response.body).toHaveProperty('message', expect.stringContaining('time conflict'));
     });
 
-    it('should return 400 if updated prelegent has time conflict with updated dates', async () => {
+    it('should return 409 if updated prelegent has time conflict with updated dates', async () => {
 
         const updates = {
             started_at: conflictingEvent.started_at.toISOString(),
             ended_at: conflictingEvent.ended_at.toISOString(),
-            prelegentIds: [prelegent2.id]
+            prelegent_ids: [prelegent2.id]
         };
         const currentData = await db('events').where({id: eventToUpdate.id}).first();
         const fullUpdateData = createFullUpdateEventData(currentData, updates);
 
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(409);
+        expect(response.body).toHaveProperty('message', expect.stringContaining('time conflict'));
+    });
+
+    it('should return 409 if updated resource has time conflict with updated dates', async () => {
+        const updates = {
+            started_at: conflictingEvent.started_at.toISOString(),
+            ended_at: conflictingEvent.ended_at.toISOString(),
+            resource_ids: [resource2.id]
+        };
+        const fullUpdateData = createFullUpdateEventData(eventToUpdate, updates);
+
+        const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
+        expect(response.statusCode).toBe(409);
         expect(response.body).toHaveProperty('message', expect.stringContaining('time conflict'));
     });
 
@@ -325,7 +391,7 @@ describe('PUT /api/v1/events/{id}', () => {
         const fullUpdateData = createFullUpdateEventData(currentData, updates);
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message', 'Event name already exists.');
+        expect(response.body.errors.some(err => err.path === 'name' && err.msg.includes('Event name already exists.'))).toBe(true);
     });
 
     it('should return 400 if updated description already exists for another event', async () => {
@@ -334,7 +400,7 @@ describe('PUT /api/v1/events/{id}', () => {
         const fullUpdateData = createFullUpdateEventData(currentData, updates);
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message', 'Event description already exists.');
+        expect(response.body.errors.some(err => err.path === 'description' && err.msg.includes('Event description already exists.'))).toBe(true);
     });
 
     it('should ALLOW updating an event with its own existing name/description (200)', async () => {

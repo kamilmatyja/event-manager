@@ -161,13 +161,13 @@ describe('DELETE /api/v1/tickets/{id}', () => {
         expect(notDeletedTicket).toBeDefined();
     });
 
-    it('should return 404 if ticket ID does not exist', async () => {
+    it('should return 400 if ticket ID does not exist', async () => {
         const nonExistentId = memberTicket.id + 999;
         const response = await request(app)
             .delete(`/api/v1/tickets/${nonExistentId}`)
             .set('Authorization', `Bearer ${memberToken}`);
-        expect(response.statusCode).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Ticket not found.');
+        expect(response.statusCode).toBe(400);
+        expect(response.body.errors.some(err => err.path === 'id' && err.msg.includes('Event with the provided ID does not exist.'))).toBe(true);
     });
 
     it('should return 400 if ticket ID format is invalid', async () => {
@@ -187,7 +187,7 @@ describe('DELETE /api/v1/tickets/{id}', () => {
             .set('Authorization', `Bearer ${memberToken}`);
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
+        expect(response.body.errors.some(err => err.path === 'id' && err.msg.includes('Cannot delete a ticket for an event that has already started.'))).toBe(true);
 
         const notDeletedTicket = await db('event_tickets').where({id: ticketForStartedEvent.id}).first();
         expect(notDeletedTicket).toBeDefined();

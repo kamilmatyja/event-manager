@@ -25,10 +25,10 @@ const enrichEventData = async (event) => {
         eventTicketModel.countByEventId(event.id)
     ]);
 
-    event.prelegentIds = prelegentLinks.map(p => p.prelegent_id);
-    event.resourceIds = resourceLinks.map(r => r.resource_id);
-    event.sponsorIds = sponsorLinks.map(s => s.sponsor_id);
-    event.cateringIds = cateringLinks.map(c => c.catering_id);
+    event.prelegent_ids = prelegentLinks.map(p => p.prelegent_id);
+    event.resource_ids = resourceLinks.map(r => r.resource_id);
+    event.sponsor_ids = sponsorLinks.map(s => s.sponsor_id);
+    event.catering_ids = cateringLinks.map(c => c.catering_id);
     event.ticket_count = ticketCount;
 
     return event;

@@ -154,15 +154,14 @@ describe('POST /api/v1/tickets', () => {
         expect(response.body.errors.some(err => err.path === 'event_id' && err.msg.includes('Invalid Event ID format'))).toBe(true);
     });
 
-    it('should return 404 if event_id does not exist', async () => {
+    it('should return 400 if event_id does not exist', async () => {
         const nonExistentId = eventAvailable.id + 999;
         const response = await request(app).post('/api/v1/tickets').set('Authorization', `Bearer ${memberToken}`).send({event_id: nonExistentId});
-        expect(response.statusCode).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Event not found.');
+        expect(response.statusCode).toBe(400);
+        expect(response.body.errors.some(err => err.path === 'event_id' && err.msg.includes('Event with the provided ID does not exist.'))).toBe(true);
     });
 
     it('should return 409 if member is already registered for this event', async () => {
-
         const response = await request(app)
             .post('/api/v1/tickets')
             .set('Authorization', `Bearer ${memberToken}`)
@@ -173,7 +172,6 @@ describe('POST /api/v1/tickets', () => {
     });
 
     it('should return 409 if member has a time conflict with another registered event', async () => {
-
         const response = await request(app)
             .post('/api/v1/tickets')
             .set('Authorization', `Bearer ${memberToken}`)
@@ -186,15 +184,13 @@ describe('POST /api/v1/tickets', () => {
     });
 
     it('should return 400 if trying to register for an event that already ended', async () => {
-
         const response = await request(app)
             .post('/api/v1/tickets')
             .set('Authorization', `Bearer ${memberToken}`)
             .send({event_id: eventPast.id});
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
-
+        expect(response.body.errors.some(err => err.path === 'event_id' && err.msg.includes('Cannot create a ticket for an event that has already ended.'))).toBe(true);
     });
 
 });

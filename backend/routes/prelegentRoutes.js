@@ -108,6 +108,12 @@ router.get('/:id', prelegentController.getPrelegentById);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       409:
  *         description: Conflict error
  *         content:
@@ -164,6 +170,12 @@ router.post(
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Not found error
  *         content:
@@ -212,6 +224,12 @@ router.put(
  *               $ref: '#/components/schemas/ValidationErrorResponse'
  *       401:
  *         description: Unauthorized error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
  *         content:
  *           application/json:
  *             schema:

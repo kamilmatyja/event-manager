@@ -1,5 +1,5 @@
 const db = require('../db/knex');
-const { intervalId } = require('../config/blacklist');
+const {intervalId} = require('../config/blacklist');
 
 async function truncateTables() {
     const tables = [

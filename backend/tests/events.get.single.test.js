@@ -75,10 +75,10 @@ describe('GET /api/v1/events/{id}', () => {
         expect(new Date(response.body.ended_at).toISOString()).toBe(eventToFetch.ended_at.toISOString());
 
         expect(response.body).toHaveProperty('ticket_count', 2);
-        expect(response.body).toHaveProperty('prelegentIds', [prelegent1.id]);
-        expect(response.body).toHaveProperty('resourceIds', [resource1.id]);
-        expect(response.body).toHaveProperty('sponsorIds', [sponsor1.id]);
-        expect(response.body).toHaveProperty('cateringIds', [catering1.id]);
+        expect(response.body).toHaveProperty('prelegent_ids', [prelegent1.id]);
+        expect(response.body).toHaveProperty('resource_ids', [resource1.id]);
+        expect(response.body).toHaveProperty('sponsor_ids', [sponsor1.id]);
+        expect(response.body).toHaveProperty('catering_ids', [catering1.id]);
         expect(response.body).toHaveProperty('created_at');
         expect(response.body).toHaveProperty('updated_at');
     });

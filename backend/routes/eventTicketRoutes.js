@@ -52,6 +52,12 @@ router.use(authorizeRole(ROLES.MEMBER));
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/my', eventTicketController.getMyTickets);
 
@@ -85,6 +91,12 @@ router.get('/my', eventTicketController.getMyTickets);
  *               $ref: '#/components/schemas/ValidationErrorResponse'
  *       401:
  *         description: Unauthorized error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
  *         content:
  *           application/json:
  *             schema:
@@ -137,6 +149,12 @@ router.post(
  *               $ref: '#/components/schemas/ValidationErrorResponse'
  *       401:
  *         description: Unauthorized error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
  *         content:
  *           application/json:
  *             schema:

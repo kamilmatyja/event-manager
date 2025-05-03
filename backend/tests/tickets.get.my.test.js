@@ -111,7 +111,7 @@ describe('GET /api/v1/tickets/my', () => {
 
         const ticket1 = response.body.find(t => t.event_id === event1.id);
         expect(ticket1).toBeDefined();
-        expect(ticket1).toHaveProperty('ticket_id');
+        expect(ticket1).toHaveProperty('id');
         expect(ticket1).toHaveProperty('purchase_price', event1.price.toString());
         expect(ticket1).toHaveProperty('purchased_at');
         expect(ticket1).toHaveProperty('event_id', event1.id);
