@@ -3,4 +3,7 @@ backend/.env
 backend/npm-debug.log
 backend/*.log
 backend/package-lock.json
+frontend/node_modules/
+frontend/npm-debug.log
+frontend/package-lock.json
 .idea/

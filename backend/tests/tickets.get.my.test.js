@@ -112,14 +112,11 @@ describe('GET /api/v1/tickets/my', () => {
         const ticket1 = response.body.find(t => t.event_id === event1.id);
         expect(ticket1).toBeDefined();
         expect(ticket1).toHaveProperty('id');
-        expect(ticket1).toHaveProperty('purchase_price', event1.price.toString());
-        expect(ticket1).toHaveProperty('purchased_at');
         expect(ticket1).toHaveProperty('event_id', event1.id);
-        expect(ticket1).toHaveProperty('event_name', event1.name);
-        expect(new Date(ticket1.event_started_at).toISOString()).toBe(event1.started_at.toISOString());
-        expect(new Date(ticket1.event_ended_at).toISOString()).toBe(event1.ended_at.toISOString());
-        expect(ticket1).toHaveProperty('locale_name', locale1.name);
-        expect(ticket1).toHaveProperty('locale_city', locale1.city);
+        expect(ticket1).toHaveProperty('user_id', memberUser.id);
+        expect(ticket1).toHaveProperty('price', event1.price.toString());
+        expect(ticket1).toHaveProperty('created_at');
+        expect(ticket1).toHaveProperty('updated_at');
     });
 
     it('should return an empty list if the logged-in member has no tickets (200)', async () => {

@@ -59,19 +59,7 @@ const findConflictingUserTickets = async (userId, startTime, endTime, excludeEve
 
 const findAllWithEventDetailsByUser = (userId) => {
     return db(TABLE_NAME + ' as et')
-        .select(
-            'et.id as id',
-            'et.price as purchase_price',
-            'et.created_at as purchased_at',
-            'et.event_id',
-            'e.name as event_name',
-            'e.started_at as event_started_at',
-            'e.ended_at as event_ended_at',
-            'l.name as locale_name',
-            'l.city as locale_city'
-        )
-        .leftJoin('events as e', 'et.event_id', 'e.id')
-        .leftJoin('locales as l', 'e.locale_id', 'l.id')
+        .join('events as e', 'et.event_id', 'e.id')
         .where('et.user_id', userId)
         .orderBy('e.started_at', 'desc');
 };

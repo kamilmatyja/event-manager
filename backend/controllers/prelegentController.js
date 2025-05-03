@@ -19,6 +19,15 @@ const getPrelegentById = async (req, res) => {
     res.status(200).json(prelegent);
 };
 
+const getMyPrelegentProfile = async (req, res) => {
+    const userId = req.user.id;
+    const prelegentProfile = await prelegentService.findPrelegentByUserId(userId);
+    if (!prelegentProfile) {
+        throw new NotFoundError('No prelegent profile found for the current user.');
+    }
+    res.status(200).json(prelegentProfile);
+};
+
 const createPrelegent = async (req, res) => {
     const newPrelegent = await prelegentService.createPrelegent(req.body);
 
@@ -54,6 +63,7 @@ const deletePrelegent = async (req, res) => {
 module.exports = {
     getAllPrelegents,
     getPrelegentById,
+    getMyPrelegentProfile,
     createPrelegent,
     updatePrelegent,
     deletePrelegent,

@@ -29,23 +29,13 @@ router.use(authorizeRole(ROLES.MEMBER));
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: A list of the user's tickets with event details.
+ *         description: A list of the user's tickets.
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                    id: { type: integer, example: 101 }
- *                    purchase_price: { type: number, format: float, example: 21.37 }
- *                    purchased_at: { type: string, format: 'date-time' }
- *                    event_id: { type: integer, example: 1 }
- *                    event_name: { type: string, example: 'Node.js Summit 2024' }
- *                    event_started_at: { type: string, format: 'date-time' }
- *                    event_ended_at: { type: string, format: 'date-time' }
- *                    locale_name: { type: string, example: 'Centrum Konferencyjne XYZ' }
- *                    locale_city: { type: string, example: 'Warszawa' }
+ *                 $ref: '#/components/schemas/EventTicket'
  *       401:
  *         description: Unauthorized error
  *         content:

@@ -1,0 +1,22 @@
+body {
+    padding-top: 56px;
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+.modal {
+    z-index: 1060;
+}
+
+.modal-backdrop {
+    z-index: 1055;
+}
+
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}

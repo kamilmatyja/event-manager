@@ -15,9 +15,6 @@ const router = express.Router();
  *   description: Prelegent management
  */
 
-router.use(authenticateToken);
-router.use(authorizeRole(ROLES.ADMINISTRATOR));
-
 /**
  * @openapi
  * /prelegents:
@@ -76,6 +73,41 @@ router.get('/:id', prelegentController.getPrelegentById);
 
 /**
  * @openapi
+ * /prelegents/my:
+ *   get:
+ *     tags: [Prelegents]
+ *     summary: Get my lectures (Prelegent only)
+ *     description: Retrieves a list of lectures purchased by the currently logged-in user. Requires Prelegent role.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of the user's lectures.
+ *         content:
+ *           application/json:
+ *               $ref: '#/components/schemas/Prelegent'
+ *       401:
+ *         description: Unauthorized error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get(
+    '/user/me',
+    authenticateToken,
+    authorizeRole(ROLES.PRELEGENT),
+    prelegentController.getMyPrelegentProfile
+);
+
+/**
+ * @openapi
  * /prelegents:
  *   post:
  *     tags: [Prelegents]
@@ -123,6 +155,8 @@ router.get('/:id', prelegentController.getPrelegentById);
  */
 router.post(
     '/',
+    authenticateToken,
+    authorizeRole(ROLES.ADMINISTRATOR),
     createPrelegentValidator,
     handleValidationErrors,
     prelegentController.createPrelegent
@@ -191,6 +225,8 @@ router.post(
  */
 router.put(
     '/:id',
+    authenticateToken,
+    authorizeRole(ROLES.ADMINISTRATOR),
     updatePrelegentValidator,
     handleValidationErrors,
     prelegentController.updatePrelegent
@@ -243,6 +279,8 @@ router.put(
  */
 router.delete(
     '/:id',
+    authenticateToken,
+    authorizeRole(ROLES.ADMINISTRATOR),
     prelegentController.deletePrelegent
 );
 
