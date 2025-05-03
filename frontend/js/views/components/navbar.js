@@ -1,6 +1,6 @@
-import {render} from '../ui.js';
-import * as auth from '../auth.js';
-import {navigateTo} from '../router.js';
+import {render} from '../../ui.js';
+import * as auth from '../../auth.js';
+import {navigateTo} from '../../router.js';
 
 const navbarContainerId = 'navbar-container';
 

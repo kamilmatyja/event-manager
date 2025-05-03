@@ -1,5 +1,5 @@
 import {fetchWrapper} from './api.js';
-import {renderNavbar} from './views/navbar.js';
+import {renderNavbar} from './views/components/navbar.js';
 import {navigateTo} from './router.js';
 
 const TOKEN_KEY = 'authToken';

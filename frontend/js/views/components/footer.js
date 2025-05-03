@@ -1,4 +1,4 @@
-import {render} from '../ui.js';
+import {render} from '../../ui.js';
 
 const footerContainerId = 'footer-container';
 

@@ -1,5 +1,5 @@
 import './router.js';
-import {renderFooter} from './views/footer.js';
+import {renderFooter} from './views/components/footer.js';
 
 renderFooter();
 

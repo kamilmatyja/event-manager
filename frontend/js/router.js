@@ -1,6 +1,6 @@
 import * as auth from './auth.js';
 import {render, showError, showLoadingSpinner} from './ui.js';
-import {renderNavbar} from './views/navbar.js';
+import {renderNavbar} from './views/components/navbar.js';
 
 import {renderHomeView} from './views/homeView.js';
 import {renderEventsList} from './views/eventsView.js';
