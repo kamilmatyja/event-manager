@@ -50,7 +50,7 @@ Poniższe kroki przeprowadzą Cię przez proces instalacji i uruchomienia aplika
 9.  **`npm run dev`**
     *   **Opis:** Uruchamia skrypt `dev` zdefiniowany w `backend/package.json`. Skrypt ten używa `concurrently` do równoczesnego uruchomienia:
         *   Serwera backendowego za pomocą `nodemon` (nasłuchuje na porcie z `.env`, np. 3000 i automatycznie restartuje się przy zmianach kodu).
-        *   Serwera deweloperskiego dla frontendu (prawdopodobnie `live-server`, nasłuchuje na porcie np. 8080 i odświeża przeglądarkę przy zmianach).
+        *   Serwera deweloperskiego dla frontendu `live-server`, nasłuchuje na porcie np. 8080 i odświeża przeglądarkę przy zmianach.
     *   **Działanie:** Jest to główna komenda do uruchomienia całej aplikacji w trybie deweloperskim. Adresy URL będą widoczne w terminalu po uruchomieniu.
 
 10. **`npm test`**
@@ -59,6 +59,6 @@ Poniższe kroki przeprowadzą Cię przez proces instalacji i uruchomienia aplika
 ---
 
 Po wykonaniu powyższych kroków, aplikacja powinna być dostępna:
-*   Frontend: Pod adresem `http://127.0.0.1:8080`.
+*   Frontend: Pod adresem `http://localhost:8080`.
 *   Backend API: Pod adresem `http://localhost:3000`.
 *   Dokumentacja API (Swagger): Pod adresem `http://localhost:3000/api-docs`.
