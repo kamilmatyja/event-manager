@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 if (!process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_HOST || !process.env.DB_PORT) {
-
     console.warn("WARN: Database connection details (USER, PASSWORD, HOST, PORT) missing in .env");
 }
 if (!process.env.DB_NAME) {
@@ -49,7 +48,7 @@ module.exports = {
             tableName: 'knex_migrations'
         },
         seeds: {
-            directory: './db/seeds/test'
+            directory: './db/seeds'
 
         }
     },

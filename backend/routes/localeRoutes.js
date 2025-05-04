@@ -3,7 +3,7 @@ const localeController = require('../controllers/localeController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createLocaleValidator, updateLocaleValidator} = require('../validators/localeValidators');
+const validator = require('../validators/localeValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', localeController.getAllLocales);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', localeController.getLocaleById);
+router.get('/:id', validator.localeIdValidator, handleValidationErrors, localeController.getLocaleById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createLocaleValidator,
+    validator.createLocaleValidator,
     handleValidationErrors,
     localeController.createLocale
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updateLocaleValidator,
+    validator.updateLocaleValidator,
     handleValidationErrors,
     localeController.updateLocale
 );
@@ -246,6 +246,8 @@ router.delete(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.localeIdValidator,
+    handleValidationErrors,
     localeController.deleteLocale
 );
 

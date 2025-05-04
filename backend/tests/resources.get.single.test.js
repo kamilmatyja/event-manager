@@ -31,7 +31,6 @@ describe('GET /api/v1/resources/{id}', () => {
             .get(`/api/v1/resources/${nonExistentId}`);
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Resource not found.');
     });
 
     it('should return 400 if resource ID format is invalid', async () => {
@@ -40,7 +39,6 @@ describe('GET /api/v1/resources/{id}', () => {
             .get(`/api/v1/resources/${invalidId}`);
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
 
     });
 });

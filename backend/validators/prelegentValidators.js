@@ -2,6 +2,15 @@ const {body, param} = require('express-validator');
 const PrelegentModel = require('../models/prelegentModel');
 const UserModel = require('../models/userModel');
 
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid prelegent ID. ID must be a positive integer.')
+];
+
+const prelegentIdValidator = [
+    ...validateId
+];
+
 const createPrelegentValidator = [
     body('user_id')
         .notEmpty().withMessage('User ID is required.')
@@ -17,6 +26,7 @@ const createPrelegentValidator = [
             if (existingPrelegent) {
                 return Promise.reject('This user is already assigned to a prelegent.');
             }
+            return true;
         }),
 
     body('name')
@@ -28,6 +38,7 @@ const createPrelegentValidator = [
             if (prelegent) {
                 return Promise.reject('Prelegent name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -38,11 +49,12 @@ const createPrelegentValidator = [
             if (prelegent) {
                 return Promise.reject('Prelegent description already exists.');
             }
+            return true;
         }),
 ];
 
 const updatePrelegentValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid prelegent ID.'),
+    ...validateId,
 
     body('user_id')
         .notEmpty()
@@ -57,6 +69,7 @@ const updatePrelegentValidator = [
             if (existingPrelegent && existingPrelegent.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('This user is already assigned to a prelegent.');
             }
+            return true;
         }),
 
     body('name')
@@ -68,6 +81,7 @@ const updatePrelegentValidator = [
             if (prelegent && prelegent.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Prelegent name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -78,10 +92,12 @@ const updatePrelegentValidator = [
             if (prelegent && prelegent.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Prelegent description already exists.');
             }
+            return true;
         }),
 ];
 
 module.exports = {
+    prelegentIdValidator,
     createPrelegentValidator,
     updatePrelegentValidator,
 };

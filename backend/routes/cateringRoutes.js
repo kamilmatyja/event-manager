@@ -3,7 +3,7 @@ const cateringController = require('../controllers/cateringController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createCateringValidator, updateCateringValidator} = require('../validators/cateringValidators');
+const validator = require('../validators/cateringValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', cateringController.getAllCaterings);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', cateringController.getCateringById);
+router.get('/:id', validator.cateringIdValidator, handleValidationErrors, cateringController.getCateringById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createCateringValidator,
+    validator.createCateringValidator,
     handleValidationErrors,
     cateringController.createCatering
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updateCateringValidator,
+    validator.updateCateringValidator,
     handleValidationErrors,
     cateringController.updateCatering
 );
@@ -246,6 +246,8 @@ router.delete(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.cateringIdValidator,
+    handleValidationErrors,
     cateringController.deleteCatering
 );
 

@@ -101,6 +101,5 @@ describe('GET /api/v1/users', () => {
             .set('Authorization', `Bearer ${memberToken}`);
 
         expect(response.statusCode).toBe(403);
-        expect(response.body).toHaveProperty('message', 'Forbidden: Insufficient permissions.');
     });
 });

@@ -1,7 +1,7 @@
 const localeModel = require('../models/localeModel');
 const eventModel = require('../models/eventModel');
-const NotFoundError = require("../errors/NotFoundError");
-const ConflictError = require("../errors/ConflictError");
+const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
 
 const findAllLocales = async () => {
     return await localeModel.findAll();
@@ -9,57 +9,42 @@ const findAllLocales = async () => {
 
 const findLocaleById = async (id) => {
     const locale = await localeModel.findById(id);
+
     if (!locale) {
-        throw new NotFoundError('Locale not found.');
+        throw new NotFoundError(`Locale with ID ${id} not found.`);
     }
+
     return locale;
 };
 
 const createLocale = async (localeData) => {
-    const existingName = await localeModel.findByName(localeData.name);
-    if (existingName) {
-        throw new ConflictError('Locale name already exists.');
-    }
     return await localeModel.create(localeData);
 };
 
 const updateLocale = async (id, localeData) => {
-    const currentLocale = await findLocaleById(id);
+    const locale = await localeModel.findById(id);
 
-    if (localeData.name && localeData.name !== currentLocale.name) {
-        const existingName = await localeModel.findByName(localeData.name);
-        if (existingName) {
-            throw new ConflictError('Locale name already exists.');
-        }
+    if (!locale) {
+        throw new NotFoundError(`Locale with ID ${id} not found.`);
     }
 
-    const dataToUpdate = {};
-    if (localeData.city !== undefined) dataToUpdate.city = localeData.city;
-    if (localeData.name !== undefined) dataToUpdate.name = localeData.name;
-
-    if (Object.keys(dataToUpdate).length === 0) {
-        return currentLocale;
-    }
-
-    const updatedLocale = await localeModel.update(id, dataToUpdate);
-    if (!updatedLocale) {
-
-        throw new NotFoundError('Locale not found during update.');
-    }
-    return updatedLocale;
+    return await localeModel.update(id, localeData);
 };
 
 const deleteLocale = async (id) => {
-    await findLocaleById(id);
+    const locale = await localeModel.findById(id);
+
+    if (!locale) {
+        throw new NotFoundError(`Locale with ID ${id} not found.`);
+    }
 
     const usageCount = await eventModel.countByLocaleId(id);
-    if (usageCount > 0) {
 
+    if (usageCount > 0) {
         throw new ConflictError(`Cannot delete locale: It is used by ${usageCount} event(s).`);
     }
 
-    const deletedCount = await localeModel.deleteById(id);
-    return deletedCount > 0;
+    return await localeModel.deleteById(id) > 0;
 };
 
 module.exports = {

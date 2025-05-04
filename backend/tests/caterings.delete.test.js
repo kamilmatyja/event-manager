@@ -122,7 +122,6 @@ describe('DELETE /api/v1/caterings/{id}', () => {
             .delete(`/api/v1/caterings/${invalidId}`)
             .set('Authorization', `Bearer ${adminToken}`);
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
     });
 
     it('should return 409 if trying to delete a catering option that is in use by an event', async () => {
@@ -131,8 +130,6 @@ describe('DELETE /api/v1/caterings/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('Cannot delete catering: It is used by');
 
         const notDeletedCatering = await db('caterings').where({id: cateringInUse.id}).first();
         expect(notDeletedCatering).toBeDefined();

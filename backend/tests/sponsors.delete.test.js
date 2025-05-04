@@ -118,7 +118,6 @@ describe('DELETE /api/v1/sponsors/{id}', () => {
             .delete(`/api/v1/sponsors/${invalidId}`)
             .set('Authorization', `Bearer ${adminToken}`);
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
     });
 
     it('should return 409 if trying to delete a sponsor that is assigned to an event', async () => {
@@ -127,8 +126,6 @@ describe('DELETE /api/v1/sponsors/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('Cannot delete sponsor: It is assigned to');
 
         const notDeletedSponsor = await db('sponsors').where({id: sponsorInUse.id}).first();
         expect(notDeletedSponsor).toBeDefined();

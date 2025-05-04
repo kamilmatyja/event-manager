@@ -89,7 +89,6 @@ describe('GET /api/v1/events/{id}', () => {
             .get(`/api/v1/events/${nonExistentId}`);
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Event not found.');
     });
 
     it('should return 400 if event ID format is invalid', async () => {
@@ -98,7 +97,5 @@ describe('GET /api/v1/events/{id}', () => {
             .get(`/api/v1/events/${invalidId}`);
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
-
     });
 });

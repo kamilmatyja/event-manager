@@ -1,6 +1,15 @@
 const {body, param} = require('express-validator');
 const SponsorModel = require('../models/sponsorModel');
 
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid sponsor ID. ID must be a positive integer.')
+];
+
+const sponsorIdValidator = [
+    ...validateId
+];
+
 const createSponsorValidator = [
     body('name')
         .trim()
@@ -11,6 +20,7 @@ const createSponsorValidator = [
             if (sponsor) {
                 return Promise.reject('Sponsor name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -21,11 +31,12 @@ const createSponsorValidator = [
             if (sponsor) {
                 return Promise.reject('Sponsor description already exists.');
             }
+            return true;
         }),
 ];
 
 const updateSponsorValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid sponsor ID.'),
+    ...sponsorIdValidator,
 
     body('name')
         .trim()
@@ -36,6 +47,7 @@ const updateSponsorValidator = [
             if (sponsor && sponsor.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Sponsor name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -46,10 +58,12 @@ const updateSponsorValidator = [
             if (sponsor && sponsor.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Sponsor description already exists.');
             }
+            return true;
         }),
 ];
 
 module.exports = {
+    sponsorIdValidator,
     createSponsorValidator,
     updateSponsorValidator,
 };

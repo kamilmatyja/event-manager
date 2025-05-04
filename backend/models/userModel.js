@@ -1,5 +1,4 @@
 const db = require('../db/knex');
-const bcrypt = require('bcrypt');
 
 const TABLE_NAME = 'users';
 

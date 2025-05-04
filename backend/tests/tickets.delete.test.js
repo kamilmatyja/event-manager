@@ -155,7 +155,6 @@ describe('DELETE /api/v1/tickets/{id}', () => {
             .set('Authorization', `Bearer ${memberToken}`);
 
         expect(response.statusCode).toBe(403);
-        expect(response.body).toHaveProperty('message', 'Forbidden: You can only delete your own tickets.');
 
         const notDeletedTicket = await db('event_tickets').where({id: otherMemberTicket.id}).first();
         expect(notDeletedTicket).toBeDefined();

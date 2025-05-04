@@ -1,6 +1,5 @@
-const config = require('../config');
-const UnauthorizedError = require("../errors/UnauthorizedError");
-const ForbiddenError = require("../errors/ForbiddenError");
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 function authorizeRole(allowedRoles) {
 

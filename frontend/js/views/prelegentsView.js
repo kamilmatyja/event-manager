@@ -48,9 +48,9 @@ export async function renderPrelegentsList(containerElement) {
                                 <select class="form-select" id="prelegentUserId" required>
                                     <option value="" selected disabled>Wybierz użytkownika...</option>
                                         ${usersCache
-                                            .filter(user => user.role === 2)
-                                            .map(user => `<option value="${user.id}">${user.nick} (${user.first_name} ${user.last_name} - ${user.email})</option>`)
-                                            .join('')}
+            .filter(user => user.role === 2)
+            .map(user => `<option value="${user.id}">${user.nick} (${user.first_name} ${user.last_name} - ${user.email})</option>`)
+            .join('')}
                                 </select>
                                 <div class="invalid-feedback">Wybór użytkownika jest wymagany.</div>
                            </div>

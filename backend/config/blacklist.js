@@ -30,7 +30,7 @@ function cleanupBlacklist() {
 const intervalId = setInterval(cleanupBlacklist, CLEANUP_INTERVAL_MS);
 cleanupBlacklist();
 
-console.log("In-memory token blacklist initialized.");
+console.log('In-memory token blacklist initialized.');
 
 module.exports = {
     add,

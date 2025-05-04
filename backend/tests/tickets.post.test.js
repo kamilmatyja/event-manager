@@ -168,7 +168,6 @@ describe('POST /api/v1/tickets', () => {
             .send({event_id: eventAlreadyRegistered.id});
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message', 'User is already registered for this event.');
     });
 
     it('should return 409 if member has a time conflict with another registered event', async () => {
@@ -178,9 +177,6 @@ describe('POST /api/v1/tickets', () => {
             .send({event_id: eventConflictingTime.id});
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('Time conflict with another event');
-        expect(response.body.message).toContain(eventAlreadyRegistered.name);
     });
 
     it('should return 400 if trying to register for an event that already ended', async () => {

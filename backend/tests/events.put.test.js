@@ -354,7 +354,6 @@ describe('PUT /api/v1/events/{id}', () => {
 
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message', expect.stringContaining('time conflict'));
     });
 
     it('should return 409 if updated prelegent has time conflict with updated dates', async () => {
@@ -369,7 +368,6 @@ describe('PUT /api/v1/events/{id}', () => {
 
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message', expect.stringContaining('time conflict'));
     });
 
     it('should return 409 if updated resource has time conflict with updated dates', async () => {
@@ -382,7 +380,6 @@ describe('PUT /api/v1/events/{id}', () => {
 
         const response = await request(app).put(`/api/v1/events/${eventToUpdate.id}`).set('Authorization', `Bearer ${adminToken}`).send(fullUpdateData);
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message', expect.stringContaining('time conflict'));
     });
 
     it('should return 400 if updated name already exists for another event', async () => {

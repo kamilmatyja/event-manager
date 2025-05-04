@@ -3,7 +3,7 @@ const eventController = require('../controllers/eventController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createEventValidator, updateEventValidator} = require('../validators/eventValidators');
+const validator = require('../validators/eventValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', eventController.getAllEvents);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', eventController.getEventById);
+router.get('/:id', validator.eventIdValidator, handleValidationErrors, eventController.getEventById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createEventValidator,
+    validator.createEventValidator,
     handleValidationErrors,
     eventController.createEvent
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updateEventValidator,
+    validator.updateEventValidator,
     handleValidationErrors,
     eventController.updateEvent
 );
@@ -246,6 +246,8 @@ router.delete(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.eventIdValidator,
+    handleValidationErrors,
     eventController.deleteEvent
 );
 

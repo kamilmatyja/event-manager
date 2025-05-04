@@ -30,7 +30,7 @@ const swaggerDefinition = {
                 type: 'http',
                 scheme: 'bearer',
                 bearerFormat: 'JWT',
-                description: "Enter JWT token (don't include 'Bearer ' prefix here)"
+                description: 'Enter JWT token (don\'t include \'Bearer \' prefix here)'
             }
         },
         schemas: {

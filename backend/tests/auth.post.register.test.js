@@ -168,19 +168,15 @@ describe('POST /api/v1/auth/register', () => {
             const bcrypt = require('bcrypt');
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(existingUserData.password, saltRounds);
-            try {
-                await db('users').insert({
-                    first_name: existingUserData.first_name,
-                    last_name: existingUserData.last_name,
-                    nick: existingUserData.nick,
-                    email: existingUserData.email,
-                    password: hashedPassword,
-                    role: existingUserData.role
-                });
-            } catch (error) {
-                console.error(`[CONFLICT TEST SETUP - beforeEach] Error inserting user ${existingUserData.email}:`, error.message);
-                throw error;
-            }
+
+            await db('users').insert({
+                first_name: existingUserData.first_name,
+                last_name: existingUserData.last_name,
+                nick: existingUserData.nick,
+                email: existingUserData.email,
+                password: hashedPassword,
+                role: existingUserData.role
+            });
         });
 
         it('should return 400 if email already exists', async () => {

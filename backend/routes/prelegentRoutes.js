@@ -3,7 +3,7 @@ const prelegentController = require('../controllers/prelegentController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createPrelegentValidator, updatePrelegentValidator} = require('../validators/prelegentValidators');
+const validator = require('../validators/prelegentValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', prelegentController.getAllPrelegents);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', prelegentController.getPrelegentById);
+router.get('/:id', validator.prelegentIdValidator, handleValidationErrors, prelegentController.getPrelegentById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createPrelegentValidator,
+    validator.createPrelegentValidator,
     handleValidationErrors,
     prelegentController.createPrelegent
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updatePrelegentValidator,
+    validator.updatePrelegentValidator,
     handleValidationErrors,
     prelegentController.updatePrelegent
 );
@@ -246,6 +246,8 @@ router.delete(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.prelegentIdValidator,
+    handleValidationErrors,
     prelegentController.deletePrelegent
 );
 

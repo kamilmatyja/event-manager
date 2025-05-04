@@ -6,8 +6,15 @@ const PrelegentModel = require('../models/prelegentModel');
 const ResourceModel = require('../models/resourceModel');
 const SponsorModel = require('../models/sponsorModel');
 const CateringModel = require('../models/cateringModel');
-const BadRequestError = require("../errors/BadRequestError");
-const NotFoundError = require("../errors/NotFoundError");
+
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid event ID. ID must be a positive integer.')
+];
+
+const eventIdValidator = [
+    ...validateId
+];
 
 const validateRelatedIds = (field, model, messageName) => {
     return body(field)
@@ -18,16 +25,16 @@ const validateRelatedIds = (field, model, messageName) => {
 
             for (const id of ids) {
                 if (typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
-                    throw new BadRequestError(`Invalid ID format in ${messageName}: ${id}. Must be a positive integer.`);
+                    return Promise.reject(`Invalid ID format in ${messageName}: ${id}. Must be a positive integer.`);
                 }
                 const record = await model.findById(id);
                 if (!record) {
-                    throw new NotFoundError(`${messageName} with ID ${id} not found.`);
+                    return Promise.reject(`${messageName} with ID ${id} not found.`);
                 }
             }
 
             if (new Set(ids).size !== ids.length) {
-                throw new BadRequestError(`Duplicate IDs found in ${messageName} array.`);
+                return Promise.reject(`Duplicate IDs found in ${messageName} array.`);
             }
             return true;
         });
@@ -38,38 +45,46 @@ const eventBaseValidator = [
         .trim()
         .notEmpty().withMessage('Event name is required.')
         .isLength({min: 5, max: 100}).withMessage('Event name must be between 5 and 100 characters.'),
+
     body('description')
         .trim()
         .notEmpty().withMessage('Event description is required.'),
+
     body('price')
         .notEmpty().withMessage('Price is required.')
         .isNumeric().withMessage('Price must be a number.')
         .isFloat({gt: -0.01}).withMessage('Price cannot be negative.'),
+
     body('locale_id')
         .notEmpty().withMessage('Locale ID is required.')
         .isInt({gt: 0}).withMessage('Invalid Locale ID.')
         .custom(async (value) => {
             const locale = await LocaleModel.findById(value);
             if (!locale) return Promise.reject('Locale with the provided ID does not exist.');
+            return true;
         }),
+
     body('category_id')
         .notEmpty().withMessage('Category ID is required.')
         .isInt({gt: 0}).withMessage('Invalid Category ID.')
         .custom(async (value) => {
             const category = await CategoryModel.findById(value);
             if (!category) return Promise.reject('Category with the provided ID does not exist.');
+            return true;
         }),
+
     body('started_at')
         .notEmpty().withMessage('Start date is required.')
         .isISO8601().withMessage('Invalid start date format (should be ISO8601).')
         .toDate(),
+
     body('ended_at')
         .notEmpty().withMessage('End date is required.')
         .isISO8601().withMessage('Invalid end date format (should be ISO8601).')
         .toDate()
         .custom((value, {req}) => {
             if (value <= req.body.started_at) {
-                throw new BadRequestError('End date must be after start date.');
+                return Promise.reject('End date must be after start date.');
             }
             return true;
         }),
@@ -86,15 +101,19 @@ const createEventValidator = [
     body('name').custom(async (value) => {
         const event = await EventModel.findByName(value);
         if (event) return Promise.reject('Event name already exists.');
+        return true;
     }),
+
     body('description').custom(async (value) => {
         const event = await EventModel.findByDescription(value);
         if (event) return Promise.reject('Event description already exists.');
+        return true;
     }),
 ];
 
 const updateEventValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid event ID.'),
+    ...eventIdValidator,
+
     ...eventBaseValidator,
 
     body('name').custom(async (value, {req}) => {
@@ -102,16 +121,20 @@ const updateEventValidator = [
         if (event && event.id !== parseInt(req.params.id, 10)) {
             return Promise.reject('Event name already exists.');
         }
+        return true;
     }),
+
     body('description').custom(async (value, {req}) => {
         const event = await EventModel.findByDescription(value);
         if (event && event.id !== parseInt(req.params.id, 10)) {
             return Promise.reject('Event description already exists.');
         }
+        return true;
     }),
 ];
 
 module.exports = {
+    eventIdValidator,
     createEventValidator,
     updateEventValidator,
 };

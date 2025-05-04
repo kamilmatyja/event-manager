@@ -4,7 +4,7 @@ const UserModel = require('../models/userModel');
 const config = require('../config');
 const {ROLES} = require('../config/roles');
 const {v4: uuidv4} = require('uuid');
-const ConflictError = require("../errors/ConflictError");
+const ConflictError = require('../errors/ConflictError');
 
 const generateToken = (user) => {
     const payload = {
@@ -31,15 +31,6 @@ const sanitizeUser = (user) => {
 
 const register = async (userData) => {
     const {first_name, last_name, nick, email, password} = userData;
-
-    const existingEmail = await UserModel.findByEmail(email);
-    if (existingEmail) {
-        throw new ConflictError('Email already exists.');
-    }
-    const existingNick = await UserModel.findByNick(nick);
-    if (existingNick) {
-        throw new ConflictError('Nick already exists.');
-    }
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);

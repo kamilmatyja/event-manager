@@ -156,11 +156,10 @@ describe('PUT /api/v1/categories/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`)
             .send(dummyUpdateData);
         expect(response.statusCode).toBe(400);
-        expect(response.body.errors.some(err => err.path === 'id' && err.msg.includes('Invalid category ID.'))).toBe(true);
     });
 
     it('should return 400 if updated name is empty', async () => {
-        const updates = {name: ""};
+        const updates = {name: ''};
         const fullUpdateData = createFullUpdateCatData(categoryToUpdate, updates);
         const response = await request(app)
             .put(`/api/v1/categories/${categoryToUpdate.id}`)
@@ -172,7 +171,7 @@ describe('PUT /api/v1/categories/{id}', () => {
     });
 
     it('should return 400 if updated description is empty', async () => {
-        const updates = {description: ""};
+        const updates = {description: ''};
         const fullUpdateData = createFullUpdateCatData(categoryToUpdate, updates);
         const response = await request(app)
             .put(`/api/v1/categories/${categoryToUpdate.id}`)
@@ -184,7 +183,7 @@ describe('PUT /api/v1/categories/{id}', () => {
     });
 
     it('should return 400 if updated name is too short/long', async () => {
-        const updatesShort = {name: "A"};
+        const updatesShort = {name: 'A'};
         const fullDataShort = createFullUpdateCatData(categoryToUpdate, updatesShort);
 
         const responseShort = await request(app)

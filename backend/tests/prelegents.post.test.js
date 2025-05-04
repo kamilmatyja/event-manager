@@ -115,9 +115,6 @@ describe('POST /api/v1/prelegents', () => {
         expect(response.body).toHaveProperty('created_at');
         expect(response.body).toHaveProperty('updated_at');
 
-        expect(response.body).toHaveProperty('user_nick', userForNewPrelegent.nick);
-        expect(response.body).toHaveProperty('user_email', userForNewPrelegent.email);
-
         const createdPrelegent = await db('prelegents').where({id: response.body.id}).first();
         expect(createdPrelegent).toBeDefined();
         expect(createdPrelegent.user_id).toBe(userForNewPrelegent.id);

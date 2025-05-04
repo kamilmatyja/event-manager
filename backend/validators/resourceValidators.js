@@ -1,6 +1,15 @@
 const {body, param} = require('express-validator');
 const ResourceModel = require('../models/resourceModel');
 
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid resource ID. ID must be a positive integer.')
+];
+
+const resourceIdValidator = [
+    ...validateId
+];
+
 const createResourceValidator = [
     body('name')
         .trim()
@@ -11,6 +20,7 @@ const createResourceValidator = [
             if (resource) {
                 return Promise.reject('Resource name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -21,11 +31,12 @@ const createResourceValidator = [
             if (resource) {
                 return Promise.reject('Resource description already exists.');
             }
+            return true;
         }),
 ];
 
 const updateResourceValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid resource ID.'),
+    ...validateId,
 
     body('name')
         .trim()
@@ -36,6 +47,7 @@ const updateResourceValidator = [
             if (resource && resource.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Resource name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -46,10 +58,12 @@ const updateResourceValidator = [
             if (resource && resource.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Resource description already exists.');
             }
+            return true;
         }),
 ];
 
 module.exports = {
+    resourceIdValidator,
     createResourceValidator,
     updateResourceValidator,
 };

@@ -3,7 +3,7 @@ const resourceController = require('../controllers/resourceController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createResourceValidator, updateResourceValidator} = require('../validators/resourceValidators');
+const validator = require('../validators/resourceValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', resourceController.getAllResources);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', resourceController.getResourceById);
+router.get('/:id', validator.resourceIdValidator, handleValidationErrors, resourceController.getResourceById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createResourceValidator,
+    validator.createResourceValidator,
     handleValidationErrors,
     resourceController.createResource
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updateResourceValidator,
+    validator.updateResourceValidator,
     handleValidationErrors,
     resourceController.updateResource
 );
@@ -246,6 +246,8 @@ router.delete(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.resourceIdValidator,
+    handleValidationErrors,
     resourceController.deleteResource
 );
 

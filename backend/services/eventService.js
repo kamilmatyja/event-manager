@@ -1,7 +1,5 @@
 const db = require('../db/knex');
 const eventModel = require('../models/eventModel');
-const localeModel = require('../models/localeModel');
-const categoryModel = require('../models/categoryModel');
 const prelegentModel = require('../models/prelegentModel');
 const resourceModel = require('../models/resourceModel');
 const sponsorModel = require('../models/sponsorModel');
@@ -11,8 +9,8 @@ const eventResourceModel = require('../models/eventResourceModel');
 const eventSponsorModel = require('../models/eventSponsorModel');
 const eventCateringModel = require('../models/eventCateringModel');
 const eventTicketModel = require('../models/eventTicketModel');
-const NotFoundError = require("../errors/NotFoundError");
-const ConflictError = require("../errors/ConflictError");
+const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
 
 const enrichEventData = async (event) => {
     if (!event) return null;
@@ -45,10 +43,10 @@ const findAllEvents = async () => {
 };
 
 const findEventById = async (id) => {
-
     const event = await eventModel.findByIdDetails(id);
+
     if (!event) {
-        throw new NotFoundError('Event not found.');
+        throw new NotFoundError(`Event with ID ${id} not found.`);
     }
 
     return await enrichEventData(event);
@@ -111,19 +109,10 @@ const createEvent = async (eventData) => {
         prelegent_ids, resource_ids, sponsor_ids, catering_ids
     } = eventData;
 
-    if (new Date(ended_at) <= new Date(started_at)) {
-        throw new ConflictError('End date must be after start date.');
-    }
-
-    const existingName = await eventModel.findByName(name);
-    if (existingName) throw new ConflictError('Event name already exists.');
-    const existingDesc = await eventModel.findByDescription(description);
-    if (existingDesc) throw new ConflictError('Event description already exists.');
-
     let newEvent;
     await db.transaction(async (trx) => {
-
         const eventInput = {name, description, price, locale_id, category_id, started_at, ended_at};
+
         newEvent = await eventModel.create(eventInput, trx);
 
         await handleRelatedEntities(trx, newEvent.id, new Date(started_at), new Date(ended_at), {
@@ -135,9 +124,10 @@ const createEvent = async (eventData) => {
 };
 
 const updateEvent = async (id, eventData) => {
-    const currentEvent = await eventModel.findById(id);
-    if (!currentEvent) {
-        throw new NotFoundError('Event not found.');
+    const event = await eventModel.findByIdDetails(id);
+
+    if (!event) {
+        throw new NotFoundError(`Event with ID ${id} not found.`);
     }
 
     const {
@@ -145,65 +135,33 @@ const updateEvent = async (id, eventData) => {
         prelegent_ids, resource_ids, sponsor_ids, catering_ids
     } = eventData;
 
-    const checkStartDate = started_at ? new Date(started_at) : new Date(currentEvent.started_at);
-    const checkEndDate = ended_at ? new Date(ended_at) : new Date(currentEvent.ended_at);
-
-    if (checkEndDate <= checkStartDate) {
-        throw new ConflictError('End date must be after start date.');
-    }
-
-    if (name && name !== currentEvent.name) {
-        const existingName = await eventModel.findByName(name);
-        if (existingName) throw new ConflictError('Event name already exists.');
-    }
-    if (description && description !== currentEvent.description) {
-        const existingDesc = await eventModel.findByDescription(description);
-        if (existingDesc) throw new ConflictError('Event description already exists.');
-    }
-
     await db.transaction(async (trx) => {
+        const eventInput = {name, description, price, locale_id, category_id, started_at, ended_at};
 
-        const eventInput = {};
-        if (name !== undefined) eventInput.name = name;
-        if (description !== undefined) eventInput.description = description;
-        if (price !== undefined) eventInput.price = price;
-        if (locale_id !== undefined) eventInput.locale_id = locale_id;
-        if (category_id !== undefined) eventInput.category_id = category_id;
-        if (started_at !== undefined) eventInput.started_at = started_at;
-        if (ended_at !== undefined) eventInput.ended_at = ended_at;
+        await eventModel.update(id, eventInput, trx);
 
-        if (Object.keys(eventInput).length > 0) {
-            await eventModel.update(id, eventInput, trx);
-        }
+        const relatedDataToUpdate = {prelegent_ids, resource_ids, sponsor_ids, catering_ids};
 
-        const relatedDataToUpdate = {};
-        if (prelegent_ids !== undefined) relatedDataToUpdate.prelegent_ids = prelegent_ids;
-        if (resource_ids !== undefined) relatedDataToUpdate.resource_ids = resource_ids;
-        if (sponsor_ids !== undefined) relatedDataToUpdate.sponsor_ids = sponsor_ids;
-        if (catering_ids !== undefined) relatedDataToUpdate.catering_ids = catering_ids;
-
-        if (Object.keys(relatedDataToUpdate).length > 0) {
-            await handleRelatedEntities(trx, id, checkStartDate, checkEndDate, relatedDataToUpdate);
-        }
+        await handleRelatedEntities(trx, id, new Date(started_at), new Date(ended_at), relatedDataToUpdate);
     });
 
     return await findEventById(id);
 };
 
 const deleteEvent = async (id) => {
+    const event = await eventModel.findByIdDetails(id);
 
-    const event = await eventModel.findById(id);
     if (!event) {
-        throw new NotFoundError('Event not found.');
+        throw new NotFoundError(`Event with ID ${id} not found.`);
     }
 
     const ticketCount = await eventTicketModel.countByEventId(id);
+
     if (ticketCount > 0) {
         throw new ConflictError(`Cannot delete event: There are ${ticketCount} tickets sold for this event.`);
     }
 
-    const deletedCount = await eventModel.deleteById(id);
-    return deletedCount > 0;
+    return await eventModel.deleteById(id) > 0;
 };
 
 module.exports = {

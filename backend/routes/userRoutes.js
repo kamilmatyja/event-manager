@@ -3,7 +3,7 @@ const userController = require('../controllers/userController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createUserValidator, updateUserValidator} = require('../validators/userValidators');
+const validator = require('../validators/userValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -94,7 +94,7 @@ router.get('/', userController.getAllUsers);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', userController.getUserById);
+router.get('/:id', validator.userIdValidator, handleValidationErrors, userController.getUserById);
 
 /**
  * @openapi
@@ -145,7 +145,7 @@ router.get('/:id', userController.getUserById);
  */
 router.post(
     '/',
-    createUserValidator,
+    validator.createUserValidator,
     handleValidationErrors,
     userController.createUser
 );
@@ -213,7 +213,7 @@ router.post(
  */
 router.put(
     '/:id',
-    updateUserValidator,
+    validator.updateUserValidator,
     handleValidationErrors,
     userController.updateUser
 );
@@ -265,6 +265,8 @@ router.put(
  */
 router.delete(
     '/:id',
+    validator.deleteUserValidator,
+    handleValidationErrors,
     userController.deleteUser
 );
 

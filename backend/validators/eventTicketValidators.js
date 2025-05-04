@@ -13,6 +13,7 @@ const createTicketValidator = [
             if (new Date(event.ended_at) < new Date()) {
                 return Promise.reject('Cannot create a ticket for an event that has already ended.');
             }
+            return true;
         }),
 ];
 
@@ -28,6 +29,7 @@ const deleteTicketValidator = [
             if (new Date(event.started_at) < new Date()) {
                 return Promise.reject('Cannot delete a ticket for an event that has already started.');
             }
+            return true;
         }),
 ];
 

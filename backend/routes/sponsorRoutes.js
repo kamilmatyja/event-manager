@@ -3,7 +3,7 @@ const sponsorController = require('../controllers/sponsorController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createSponsorValidator, updateSponsorValidator} = require('../validators/sponsorValidators');
+const validator = require('../validators/sponsorValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', sponsorController.getAllSponsors);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', sponsorController.getSponsorById);
+router.get('/:id', validator.sponsorIdValidator, handleValidationErrors, sponsorController.getSponsorById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createSponsorValidator,
+    validator.createSponsorValidator,
     handleValidationErrors,
     sponsorController.createSponsor
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updateSponsorValidator,
+    validator.updateSponsorValidator,
     handleValidationErrors,
     sponsorController.updateSponsor
 );
@@ -246,6 +246,8 @@ router.delete(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.sponsorIdValidator,
+    handleValidationErrors,
     sponsorController.deleteSponsor
 );
 

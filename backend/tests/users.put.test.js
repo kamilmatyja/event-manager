@@ -199,7 +199,7 @@ describe('PUT /api/v1/users/{id}', () => {
     });
 
     it('should return 400 if updated email format is invalid', async () => {
-        const updates = {email: "invalid-email"};
+        const updates = {email: 'invalid-email'};
         const fullUpdateData = createFullUpdateData(userToUpdate, updates);
         const response = await request(app)
             .put(`/api/v1/users/${userToUpdate.id}`)
@@ -221,7 +221,7 @@ describe('PUT /api/v1/users/{id}', () => {
     });
 
     it('should return 400 if updated password is provided but too short', async () => {
-        const updates = {password: "short"};
+        const updates = {password: 'short'};
         const fullUpdateData = createFullUpdateData(userToUpdate, updates);
         const response = await request(app)
             .put(`/api/v1/users/${userToUpdate.id}`)

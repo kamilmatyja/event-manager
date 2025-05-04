@@ -22,6 +22,7 @@ const registerValidator = [
             if (user) {
                 return Promise.reject('Nick already exists.');
             }
+            return true;
         }),
 
     body('email')
@@ -34,6 +35,7 @@ const registerValidator = [
             if (user) {
                 return Promise.reject('Email already exists.');
             }
+            return true;
         }),
 
     body('password')

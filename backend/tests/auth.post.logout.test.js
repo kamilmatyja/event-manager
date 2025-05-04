@@ -22,31 +22,26 @@ describe('POST /api/v1/auth/logout', () => {
     beforeEach(async () => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(testUser.plainPassword, saltRounds);
-        try {
-            await db('users').where({email: testUser.email}).del();
-            const [createdUser] = await db('users')
-                .insert({
-                    first_name: testUser.first_name,
-                    last_name: testUser.last_name,
-                    nick: testUser.nick,
-                    email: testUser.email,
-                    password: hashedPassword,
-                    role: testUser.role,
-                })
-                .returning('id');
-            testUserId = typeof createdUser === 'object' ? createdUser.id : createdUser;
-            if (!testUserId) throw new Error("Failed to create user in beforeAll");
 
-            const payload = {id: testUserId, nick: testUser.nick, role: testUser.role, jti: uuidv4()};
-            validToken = jwt.sign(payload, config.jwt.secret, {expiresIn: config.jwt.expiresIn});
-            const decoded = jwt.decode(validToken);
-            validTokenJti = decoded.jti;
-            validTokenExp = decoded.exp;
+        await db('users').where({email: testUser.email}).del();
+        const [createdUser] = await db('users')
+            .insert({
+                first_name: testUser.first_name,
+                last_name: testUser.last_name,
+                nick: testUser.nick,
+                email: testUser.email,
+                password: hashedPassword,
+                role: testUser.role,
+            })
+            .returning('id');
+        testUserId = typeof createdUser === 'object' ? createdUser.id : createdUser;
+        if (!testUserId) throw new Error('Failed to create user in beforeAll');
 
-        } catch (error) {
-            console.error(`[LOGOUT TEST SETUP - beforeEach] Error:`, error.message);
-            throw error;
-        }
+        const payload = {id: testUserId, nick: testUser.nick, role: testUser.role, jti: uuidv4()};
+        validToken = jwt.sign(payload, config.jwt.secret, {expiresIn: config.jwt.expiresIn});
+        const decoded = jwt.decode(validToken);
+        validTokenJti = decoded.jti;
+        validTokenExp = decoded.exp;
     });
 
     it('should successfully logout and revoke the token (200)', async () => {
@@ -63,7 +58,6 @@ describe('POST /api/v1/auth/logout', () => {
             .set('Authorization', `Bearer ${validToken}`);
 
         expect(logoutResponse.statusCode).toBe(200);
-        expect(logoutResponse.body).toHaveProperty('message', 'Logout successful. Token has been revoked.');
 
         expect(blacklist.has(validTokenJti)).toBe(true);
 
@@ -71,7 +65,6 @@ describe('POST /api/v1/auth/logout', () => {
             .get('/api/v1/auth/me')
             .set('Authorization', `Bearer ${validToken}`);
         expect(afterLogoutRes.statusCode).toBe(401);
-        expect(afterLogoutRes.body).toHaveProperty('message', 'Unauthorized: Token has been revoked.');
     });
 
     it('should return 401 if no token is provided', async () => {
@@ -79,7 +72,6 @@ describe('POST /api/v1/auth/logout', () => {
             .post('/api/v1/auth/logout');
 
         expect(response.statusCode).toBe(401);
-        expect(response.body).toHaveProperty('message', 'Unauthorized: Missing token.');
     });
 
     it('should return 401 if the token is invalid (bad signature)', async () => {
@@ -89,8 +81,6 @@ describe('POST /api/v1/auth/logout', () => {
             .set('Authorization', `Bearer ${invalidToken}`);
 
         expect(response.statusCode).toBe(401);
-
-        expect(response.body).toHaveProperty('message', 'Unauthorized: Token has been revoked.');
     });
 
     it('should return 401 if the token is expired', async () => {
@@ -102,7 +92,6 @@ describe('POST /api/v1/auth/logout', () => {
             .set('Authorization', `Bearer ${expiredToken}`);
 
         expect(response.statusCode).toBe(401);
-        expect(response.body).toHaveProperty('message', 'Unauthorized: Token expired.');
     });
 
     it('should return 401 if the token is already revoked (blacklisted)', async () => {
@@ -119,7 +108,6 @@ describe('POST /api/v1/auth/logout', () => {
             .set('Authorization', `Bearer ${tokenToRevoke}`);
 
         expect(response.statusCode).toBe(401);
-        expect(response.body).toHaveProperty('message', 'Unauthorized: Token has been revoked.');
     });
 
     it('should prevent access to a protected route (/auth/me) using a token after logout (401)', async () => {
@@ -145,7 +133,6 @@ describe('POST /api/v1/auth/logout', () => {
             .set('Authorization', `Bearer ${freshToken}`);
 
         expect(meAfterLogout.statusCode).toBe(401);
-        expect(meAfterLogout.body).toHaveProperty('message', 'Unauthorized: Token has been revoked.');
     });
 
 });

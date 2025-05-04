@@ -4,6 +4,15 @@ const {ROLES} = require('../config/roles');
 
 const allowedRoles = Object.values(ROLES);
 
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid user ID. ID must be a positive integer.')
+];
+
+const userIdValidator = [
+    ...validateId
+];
+
 const createUserValidator = [
     body('first_name')
         .trim()
@@ -25,6 +34,7 @@ const createUserValidator = [
             if (user) {
                 return Promise.reject('Nick already exists.');
             }
+            return true;
         }),
 
     body('email')
@@ -37,6 +47,7 @@ const createUserValidator = [
             if (user) {
                 return Promise.reject('Email already exists.');
             }
+            return true;
         }),
 
     body('password')
@@ -53,7 +64,7 @@ const createUserValidator = [
 ];
 
 const updateUserValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid user ID.'),
+    ...validateId,
 
     body('first_name')
         .trim()
@@ -75,6 +86,7 @@ const updateUserValidator = [
             if (user && user.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Nick already exists.');
             }
+            return true;
         }),
 
     body('email')
@@ -87,6 +99,7 @@ const updateUserValidator = [
             if (user && user.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Email already exists.');
             }
+            return true;
         }),
 
     body('password')
@@ -102,7 +115,19 @@ const updateUserValidator = [
         .isIn(allowedRoles).withMessage(`Role must be one of: ${allowedRoles.join(', ')}`)
 ];
 
+const deleteUserValidator = [
+    ...validateId,
+    param('id').custom((value, {req}) => {
+        if (parseInt(value, 10) === req.user.id) {
+            return Promise.reject('Cannot delete your own account.');
+        }
+        return true;
+    })
+];
+
 module.exports = {
+    userIdValidator,
     createUserValidator,
     updateUserValidator,
+    deleteUserValidator,
 };

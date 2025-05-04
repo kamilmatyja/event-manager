@@ -3,7 +3,7 @@ const eventTicketController = require('../controllers/eventTicketController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createTicketValidator, deleteTicketValidator} = require('../validators/eventTicketValidators');
+const validator = require('../validators/eventTicketValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -106,7 +106,7 @@ router.get('/my', eventTicketController.getMyTickets);
  */
 router.post(
     '/',
-    createTicketValidator,
+    validator.createTicketValidator,
     handleValidationErrors,
     eventTicketController.createTicket
 );
@@ -158,7 +158,7 @@ router.post(
  */
 router.delete(
     '/:id',
-    deleteTicketValidator,
+    validator.deleteTicketValidator,
     handleValidationErrors,
     eventTicketController.deleteTicket
 );

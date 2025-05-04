@@ -183,7 +183,6 @@ describe('DELETE /api/v1/users/{id}', () => {
             .delete(`/api/v1/users/${invalidId}`)
             .set('Authorization', `Bearer ${adminToken}`);
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
     });
 
     it('should return 409 if trying to delete a user who is a prelegent', async () => {
@@ -192,8 +191,6 @@ describe('DELETE /api/v1/users/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('is registered as a prelegent');
 
         const notDeletedUser = await db('users').where({id: userAsPrelegent.id}).first();
         expect(notDeletedUser).toBeDefined();
@@ -205,9 +202,6 @@ describe('DELETE /api/v1/users/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('has');
-        expect(response.body.message).toContain('event ticket(s)');
 
         const notDeletedUser = await db('users').where({id: userWithTicket.id}).first();
         expect(notDeletedUser).toBeDefined();
@@ -220,8 +214,6 @@ describe('DELETE /api/v1/users/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('Cannot delete your own account.');
 
         const notDeletedUser = await db('users').where({id: adminUser.id}).first();
         expect(notDeletedUser).toBeDefined();

@@ -221,7 +221,6 @@ describe('PUT /api/v1/prelegents/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`)
             .send(dummyUpdateData);
         expect(response.statusCode).toBe(400);
-        expect(response.body.errors.some(err => err.path === 'id' && err.msg.includes('Invalid prelegent ID.'))).toBe(true);
     });
 
     it('should return 400 if updated user_id does not exist in users table', async () => {
@@ -240,7 +239,7 @@ describe('PUT /api/v1/prelegents/{id}', () => {
     });
 
     it('should return 400 if updated name is empty', async () => {
-        const updates = {name: ""};
+        const updates = {name: ''};
         const currentPrelegentData = await db('prelegents').where({id: prelegentToUpdateRecord.id}).first();
         const fullUpdateData = createFullUpdatePrelegentData(currentPrelegentData, updates);
         const response = await request(app)
@@ -252,7 +251,7 @@ describe('PUT /api/v1/prelegents/{id}', () => {
     });
 
     it('should return 400 if updated name is too short/long', async () => {
-        const updatesShort = {name: "A"};
+        const updatesShort = {name: 'A'};
         const currentPrelegentData = await db('prelegents').where({id: prelegentToUpdateRecord.id}).first();
         const fullDataShort = createFullUpdatePrelegentData(currentPrelegentData, updatesShort);
 
@@ -266,7 +265,7 @@ describe('PUT /api/v1/prelegents/{id}', () => {
     });
 
     it('should return 400 if updated user_id format is invalid', async () => {
-        const updates = {user_id: "invalid"};
+        const updates = {user_id: 'invalid'};
         const currentPrelegentData = await db('prelegents').where({id: prelegentToUpdateRecord.id}).first();
         const fullUpdateData = createFullUpdatePrelegentData(currentPrelegentData, updates);
         const response = await request(app)

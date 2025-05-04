@@ -1,6 +1,15 @@
 const {body, param} = require('express-validator');
 const LocaleModel = require('../models/localeModel');
 
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid locale ID. ID must be a positive integer.')
+];
+
+const localeIdValidator = [
+    ...validateId
+];
+
 const createLocaleValidator = [
     body('city')
         .trim()
@@ -16,11 +25,12 @@ const createLocaleValidator = [
             if (locale) {
                 return Promise.reject('Locale name already exists.');
             }
+            return true;
         }),
 ];
 
 const updateLocaleValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid locale ID.'),
+    ...validateId,
 
     body('city')
         .trim()
@@ -36,10 +46,12 @@ const updateLocaleValidator = [
             if (locale && locale.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Locale name already exists.');
             }
+            return true;
         }),
 ];
 
 module.exports = {
+    localeIdValidator,
     createLocaleValidator,
     updateLocaleValidator,
 };

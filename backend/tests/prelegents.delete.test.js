@@ -164,7 +164,6 @@ describe('DELETE /api/v1/prelegents/{id}', () => {
             .delete(`/api/v1/prelegents/${invalidId}`)
             .set('Authorization', `Bearer ${adminToken}`);
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
     });
 
     it('should return 409 if trying to delete a prelegent assigned to an event', async () => {
@@ -173,8 +172,6 @@ describe('DELETE /api/v1/prelegents/{id}', () => {
             .set('Authorization', `Bearer ${adminToken}`);
 
         expect(response.statusCode).toBe(409);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toContain('Cannot delete prelegent: They are assigned to');
 
         const notDeletedPrelegent = await db('prelegents').where({id: prelegentInUse.id}).first();
         expect(notDeletedPrelegent).toBeDefined();

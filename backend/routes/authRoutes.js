@@ -1,6 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/authController');
-const {registerValidator, loginValidator} = require('../validators/authValidators');
+const validator = require('../validators/authValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 const authenticateToken = require('../middleware/authenticateToken');
 
@@ -48,7 +48,7 @@ const router = express.Router();
  */
 router.post(
     '/register',
-    registerValidator,
+    validator.registerValidator,
     handleValidationErrors,
     authController.register
 );
@@ -88,7 +88,7 @@ router.post(
  */
 router.post(
     '/login',
-    loginValidator,
+    validator.loginValidator,
     handleValidationErrors,
     authController.login
 );

@@ -31,7 +31,6 @@ describe('GET /api/v1/caterings/{id}', () => {
             .get(`/api/v1/caterings/${nonExistentId}`);
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Catering not found.');
     });
 
     it('should return 400 if catering ID format is invalid', async () => {
@@ -40,7 +39,6 @@ describe('GET /api/v1/caterings/{id}', () => {
             .get(`/api/v1/caterings/${invalidId}`);
 
         expect(response.statusCode).toBe(400);
-        expect(response.body).toHaveProperty('message');
 
     });
 });

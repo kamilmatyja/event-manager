@@ -3,7 +3,7 @@ const categoryController = require('../controllers/categoryController');
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeRole = require('../middleware/authorizeRole');
 const {ROLES} = require('../config/roles');
-const {createCategoryValidator, updateCategoryValidator} = require('../validators/categoryValidators');
+const validator = require('../validators/categoryValidators');
 const {handleValidationErrors} = require('../validators/validationErrorHandler');
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router.get('/', categoryController.getAllCategories);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/:id', categoryController.getCategoryById);
+router.get('/:id', validator.categoryIdValidator, handleValidationErrors, categoryController.getCategoryById);
 
 /**
  * @openapi
@@ -122,7 +122,7 @@ router.post(
     '/',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    createCategoryValidator,
+    validator.createCategoryValidator,
     handleValidationErrors,
     categoryController.createCategory
 );
@@ -192,7 +192,7 @@ router.put(
     '/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
-    updateCategoryValidator,
+    validator.updateCategoryValidator,
     handleValidationErrors,
     categoryController.updateCategory
 );
@@ -245,6 +245,8 @@ router.put(
 router.delete('/:id',
     authenticateToken,
     authorizeRole(ROLES.ADMINISTRATOR),
+    validator.categoryIdValidator,
+    handleValidationErrors,
     categoryController.deleteCategory
 );
 

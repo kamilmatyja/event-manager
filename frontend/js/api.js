@@ -21,40 +21,35 @@ export async function fetchWrapper(endpoint, options = {}) {
         },
     };
 
-    try {
-        const response = await fetch(url, config);
+    const response = await fetch(url, config);
 
-        if (!response.ok) {
+    if (!response.ok) {
 
-            if ((response.status === 401 || response.status === 403) && token) {
-                setTimeout(logout, 0);
+        if ((response.status === 401 || response.status === 403) && token) {
+            setTimeout(logout, 0);
 
-                const errorData = await response.json().catch(() => ({message: `HTTP error ${response.status}`}));
-                throw new Error(errorData.message || `HTTP error ${response.status}`);
-            }
-
-            let errorData;
-            try {
-                errorData = await response.json();
-            } catch (e) {
-                errorData = {message: `HTTP error ${response.status}: ${response.statusText}`};
-            }
-
-            if (errorData.errors && Array.isArray(errorData.errors)) {
-                const validationMessages = errorData.errors.map(e => `${e.path}: ${e.msg}`).join('; ');
-                throw new Error(`Validation failed: ${validationMessages}`);
-            }
-
+            const errorData = await response.json().catch(() => ({message: `HTTP error ${response.status}`}));
             throw new Error(errorData.message || `HTTP error ${response.status}`);
         }
 
-        if (response.status === 204) {
-            return null;
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            errorData = {message: `HTTP error ${response.status}: ${response.statusText}`};
         }
 
-        return await response.json();
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+            const validationMessages = errorData.errors.map(e => `${e.path}: ${e.msg}`).join('; ');
+            throw new Error(`Validation failed: ${validationMessages}`);
+        }
 
-    } catch (error) {
-        throw error;
+        throw new Error(errorData.message || `HTTP error ${response.status}`);
     }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    return await response.json();
 }

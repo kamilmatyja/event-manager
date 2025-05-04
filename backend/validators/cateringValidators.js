@@ -1,6 +1,15 @@
 const {body, param} = require('express-validator');
 const CateringModel = require('../models/cateringModel');
 
+const validateId = [
+    param('id')
+        .isInt({gt: 0}).withMessage('Invalid catering ID. ID must be a positive integer.')
+];
+
+const cateringIdValidator = [
+    ...validateId
+];
+
 const createCateringValidator = [
     body('name')
         .trim()
@@ -11,22 +20,23 @@ const createCateringValidator = [
             if (catering) {
                 return Promise.reject('Catering name already exists.');
             }
+            return true;
         }),
 
     body('description')
         .trim()
         .notEmpty().withMessage('Catering description is required.')
-
         .custom(async (value) => {
             const catering = await CateringModel.findByDescription(value);
             if (catering) {
                 return Promise.reject('Catering description already exists.');
             }
+            return true;
         }),
 ];
 
 const updateCateringValidator = [
-    param('id').isInt({gt: 0}).withMessage('Invalid catering ID.'),
+    ...validateId,
 
     body('name')
         .trim()
@@ -37,6 +47,7 @@ const updateCateringValidator = [
             if (catering && catering.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Catering name already exists.');
             }
+            return true;
         }),
 
     body('description')
@@ -47,10 +58,12 @@ const updateCateringValidator = [
             if (catering && catering.id !== parseInt(req.params.id, 10)) {
                 return Promise.reject('Catering description already exists.');
             }
+            return true;
         }),
 ];
 
 module.exports = {
+    cateringIdValidator,
     createCateringValidator,
     updateCateringValidator,
 };

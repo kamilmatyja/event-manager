@@ -21,7 +21,7 @@ async function truncateTables() {
     try {
         await db.raw(`TRUNCATE TABLE ${tables.join(', ')} RESTART IDENTITY CASCADE`);
     } catch (error) {
-        console.error("Error truncating tables:", error);
+        console.error('Error truncating tables:', error);
         throw error;
     }
 }
@@ -32,7 +32,7 @@ beforeAll(async () => {
         await db.migrate.latest();
         console.log('Migrations complete.');
     } catch (error) {
-        console.error("Error during beforeAll setup:", error);
+        console.error('Error during beforeAll setup:', error);
         throw error;
     }
 });
@@ -50,7 +50,7 @@ afterAll(async () => {
         console.log('Cleared blacklist cleanup interval.');
         console.log('Database connection closed.');
     } catch (error) {
-        console.error("Error during afterAll cleanup:", error);
+        console.error('Error during afterAll cleanup:', error);
     }
 });
 
