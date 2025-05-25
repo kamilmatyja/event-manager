@@ -28,7 +28,7 @@ export async function renderPrelegentsList(containerElement) {
                 </button>
             </div>
             <div id="prelegents-table-container">
-                ${renderPrelegentsTable(prelegentsCache)}
+                ${renderPrelegentsTable(prelegentsCache, usersCache)}
             </div>
 
             <!-- Modal do dodawania/edycji -->
@@ -106,7 +106,7 @@ export async function renderPrelegentsList(containerElement) {
     }
 }
 
-function renderPrelegentsTable(prelegents) {
+function renderPrelegentsTable(prelegents, users) {
     if (!prelegents || prelegents.length === 0) {
         return '<p>Brak zdefiniowanych prelegentów.</p>';
     }
@@ -115,7 +115,17 @@ function renderPrelegentsTable(prelegents) {
         <tr>
             <td>${p.id}</td>
             <td>${escapeHtml(p.name)}</td>
-            <td>${escapeHtml(p.user_nick + '(' + p.user_first_name + ' ' + p.user_last_name + ' - ' + p.user_email + ')')}</td>
+            <td>
+                ${(() => {
+        const user = users.find(user => user.id === p.user_id);
+        return escapeHtml(
+            user?.nick + ' (' +
+            user?.first_name + ' ' +
+            user?.last_name + ' - ' +
+            user?.email + ')'
+        );
+    })()}
+            </td>
             <td>${escapeHtml(p.description)}</td>
             <td>
                 <button class="btn btn-sm btn-primary edit-prelegent-btn" data-id="${p.id}" title="Edytuj">

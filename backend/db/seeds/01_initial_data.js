@@ -44,29 +44,61 @@ exports.seed = async function (knex) {
             last_name: 'Nowak',
             nick: 'anna_prelegent',
             email: 'anna.prelegent@example.com',
-            password: await bcrypt.hash('prelegentPass1', saltRounds),
+            password: password,
             role: ROLES.PRELEGENT,
         },
         {
-            first_name: 'Piotr', last_name: 'Kowalski', nick: 'piotr_member',
-            email: 'piotr@example.com', password: await bcrypt.hash('memberPass2', saltRounds), role: ROLES.MEMBER,
+            first_name: 'Piotr', last_name: 'Kowalski', nick: 'piotr_prelegent',
+            email: 'piotr@example.com', password: password, role: ROLES.PRELEGENT,
         },
         {
             first_name: 'Jan',
             last_name: 'Zieliński',
             nick: 'jan_prelegent',
             email: 'jan.prelegent@example.com',
-            password: await bcrypt.hash('prelegentPass2', saltRounds),
+            password: password,
             role: ROLES.PRELEGENT,
         },
-        ...Array.from({length: 5}, (_, i) => ({
-            first_name: `UserFirstName${i + 6}`,
-            last_name: `UserLastName${i + 6}`,
-            nick: `user_${i + 6}`,
-            email: `user${i + 6}@example.com`,
-            password: bcrypt.hashSync(`userPass${i + 6}`, saltRounds),
+        {
+            first_name: 'Marek',
+            last_name: 'Kowalski',
+            nick: 'marek_k',
+            email: 'marek.kowalski@example.com',
+            password: password,
             role: ROLES.MEMBER,
-        })),
+        },
+        {
+            first_name: 'Joanna',
+            last_name: 'Nowak',
+            nick: 'joanna_n',
+            email: 'joanna.nowak@example.com',
+            password: password,
+            role: ROLES.MEMBER,
+        },
+        {
+            first_name: 'Paweł',
+            last_name: 'Wiśniewski',
+            nick: 'pawel_w',
+            email: 'pawel.wisniewski@example.com',
+            password: password,
+            role: ROLES.MEMBER,
+        },
+        {
+            first_name: 'Zofia',
+            last_name: 'Zielińska',
+            nick: 'zofia_z',
+            email: 'zofia.zielinska@example.com',
+            password: password,
+            role: ROLES.MEMBER,
+        },
+        {
+            first_name: 'Krzysztof',
+            last_name: 'Lewandowski',
+            nick: 'krzysztof_l',
+            email: 'krzysztof.lewandowski@example.com',
+            password: password,
+            role: ROLES.MEMBER,
+        },
     ];
     const insertedUsers = await knex('users').insert(usersToInsert).returning('*');
     console.log(`Inserted ${insertedUsers.length} users.`);
@@ -105,28 +137,56 @@ exports.seed = async function (knex) {
 
     console.log('Inserting prelegents...');
     const prelegentsToInsert = [
-
         {
-            user_id: insertedUsers.find(u => u.nick === 'anna_prelegent').id,
+            user_id: insertedUsers[0].id,
             name: 'Dr Anna Nowak',
             description: 'Specjalistka AI i Machine Learning.'
         },
         {
-            user_id: insertedUsers.find(u => u.nick === 'jan_prelegent').id,
+            user_id: insertedUsers[1].id,
             name: 'Prof. Jan Zieliński',
             description: 'Ekspert cyberbezpieczeństwa.'
         },
         {
-            user_id: insertedUsers.find(u => u.nick === 'admin_root').id,
+            user_id: insertedUsers[2].id,
             name: 'Admin Prelegent Wewn.',
             description: 'Prelegent wewnętrzny firmy.'
         },
-
-        ...insertedUsers.slice(3, 10).map((user, i) => ({
-            user_id: user.id,
-            name: `${user.first_name} ${user.last_name} (Prelegent ${i + 3})`,
-            description: `Opis prelegenta dla ${user.nick}. Zajmuje się tematyką ${i % 2 === 0 ? 'Frontend' : 'Backend'} i chmurą.`,
-        })),
+        {
+            user_id: insertedUsers[3].id,
+            name: 'Michał Kowalczyk',
+            description: 'Ekspert w dziedzinie Frontendu i technologii chmurowych.'
+        },
+        {
+            user_id: insertedUsers[4].id,
+            name: 'Katarzyna Wiśniewska',
+            description: 'Specjalistka Backendowa z doświadczeniem w systemach rozproszonych.'
+        },
+        {
+            user_id: insertedUsers[5].id,
+            name: 'Tomasz Nowak',
+            description: 'Frontend Developer z pasją do tworzenia interfejsów użytkownika.'
+        },
+        {
+            user_id: insertedUsers[6].id,
+            name: 'Anna Zielińska',
+            description: 'Backend Developer z doświadczeniem w projektowaniu API.'
+        },
+        {
+            user_id: insertedUsers[7].id,
+            name: 'Piotr Lewandowski',
+            description: 'Frontend Developer specjalizujący się w aplikacjach mobilnych.'
+        },
+        {
+            user_id: insertedUsers[8].id,
+            name: 'Ewa Majewska',
+            description: 'Backend Developer z doświadczeniem w pracy z bazami danych.'
+        },
+        {
+            user_id: insertedUsers[9].id,
+            name: 'Jakub Wójcik',
+            description: 'Frontend Developer z zamiłowaniem do optymalizacji wydajności.'
+        }
     ];
     const insertedPrelegents = await knex('prelegents').insert(prelegentsToInsert).returning('*');
     console.log(`Inserted ${insertedPrelegents.length} prelegents.`);
